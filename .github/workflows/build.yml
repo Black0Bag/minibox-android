@@ -1,0 +1,81 @@
+name: 构建并发布
+
+on:
+  push:
+    branches: [ "master" ]
+    tags: [ "v*" ]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - 'gradle/**'
+      - 'gradle.properties'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 设置 Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: 单元测试
+        run: ./gradlew testDebugUnitTest
+
+      - name: Lint 检查
+        run: ./gradlew lintDebug
+
+      - name: 构建 Debug APK
+        run: ./gradlew assembleDebug
+
+      - name: 重命名 APK（带版本号）
+        run: |
+          VERSION=$(grep '^\s*versionName' app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          if [ -z "$VERSION" ]; then VERSION=$(date +%Y%m%d%H%M%S); fi
+          echo "提取到的版本号: $VERSION"
+          echo "APK_VERSION=$VERSION" >> "$GITHUB_ENV"
+          cp app/build/outputs/apk/debug/*.apk "app/build/outputs/apk/debug/minibox-${VERSION}-debug.apk"
+
+      - name: 上传 APK 产物
+        uses: actions/upload-artifact@v7
+        with:
+          name: minibox-v${{ env.APK_VERSION }}-debug
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: 发布 Debug Release（每次构建自动发布）
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ env.APK_VERSION }}-debug
+          name: minibox v${{ env.APK_VERSION }} (Debug)
+          body: |
+            ## minibox v${{ env.APK_VERSION }} Debug 构建
+            此版本由 CI 自动构建，commit: `${{ github.sha }}`
+            **安装方法**：下载 APK 后在手机上安装（需开启"允许未知来源"）
+            **注意**：Debug 版本包含调试信息，体积较大
+          files: app/build/outputs/apk/debug/*.apk
+          prerelease: true
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 构建 Release APK（仅 tag 触发）
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: ./gradlew assembleRelease
+
+      - name: 发布正式 Release（仅 tag 触发）
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: app/build/outputs/apk/release/*.apk
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
