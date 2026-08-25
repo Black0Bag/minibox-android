@@ -1,18 +1,41 @@
-# 敏感信息——绝不上传
+# 敏感信息与本地配置
 api
 *.key
 *.pem
+*.jks
+*.keystore
 .env
 .env.*
 secrets.*
 *config*.local*
+local.properties
 
-# 运行时产物
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Gradle / build outputs
+.gradle/
+**/build/
+build/
+out/
+
+# Logs and packages
+*.log
+*.apk
+*.aab
+*.ap_
+
+# Runtime/test data
 *.db
+*.db-wal
+*.db-shm
 *.sqlite
 runtime/
 data/
-
-# 测试临时文件夹
 test-tmp/
 /tmp/
