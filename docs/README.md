@@ -16,8 +16,13 @@
 
 - `[ASK USER]` Android `minSdk` / `targetSdk`。
 - `[ASK USER]` APP 通过本机、局域网、VPN/隧道还是公网连接后端。
-- `[ASK USER]` REST 认证方式和凭据轮换责任。
-- `[ASK USER]` 首版哪些会话/团队状态必须跨后端重启恢复。
+- `[ASK USER]` 首版哪些会话/团队状态必须跨后端重启恢复
+  （会话消息已由后端持久化；团队项目与 SSE 历史仍在内存）。
 - `[ASK USER]` OpenAPI 在 Android 开工前还是第一轮 DTO 后冻结。
+- `[ASK USER]` 浏览器代理（WebView 执行 + 后端下发）排在哪个阶段。
 
-没有这些决策时可以创建纯网络 fixture 和 UI 原型，但不应发布可连接非 loopback 后端的生产版本。
+已解决（2026-09-02）：REST 认证方式（固定 Bearer Token，`data/auth.token`）、
+Agent 审批提交 API、teamwork DTO 命名冻结。
+
+现在可以开始创建工程与网络层：认证、错误契约、审批链路和 teamwork DTO 都已
+冻结且有测试锁定。剩余开放决策不阻塞网络层与连接诊断的实现。
