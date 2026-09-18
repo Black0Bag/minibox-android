@@ -1,19 +1,20 @@
 package com.blackbag.minibox.core.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
  * 会话（证据：后端 docs/api.md §2）。
  *
- * 字段统一 lower_snake_case；at 均为 RFC3339。
+ * 字段统一 lower_snake_case（@SerialName 对齐后端 Go struct tag）；at 均为 RFC3339。
  * 会话列表按 updated_at 倒序返回（服务端保证）。
  */
 @Serializable
 data class Session(
     val id: String,
     val title: String,
-    val createdAt: String,
-    val updatedAt: String,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String,
     val messages: List<Message> = emptyList(),
     val mode: String? = null,
 )
@@ -27,7 +28,7 @@ data class Session(
 data class Message(
     val role: String,
     val content: String,
-    val runId: String? = null,
+    @SerialName("run_id") val runId: String? = null,
     val at: String,
 )
 
@@ -61,6 +62,6 @@ data class SendChatMessage(
  */
 @Serializable
 data class ApprovalResult(
-    val runId: String? = null,
+    @SerialName("run_id") val runId: String? = null,
     val approved: Boolean? = null,
 )
