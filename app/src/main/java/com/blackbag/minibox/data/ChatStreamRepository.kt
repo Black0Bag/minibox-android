@@ -95,16 +95,16 @@ class ChatStreamRepository(
             seenEventIds.remove(seenEventIds.first())
         }
 
-        val seq = envelope.seq ?: return Accept.OK
+        val seq: Long = envelope.seq?.toLong() ?: return Accept.OK
         val prev = lastSeq
+        // 缺口检测：seq > prev+1 说明有事件丢失，要求全量刷新
         if (prev != null && seq > prev + 1) {
             Log.w(TAG, "SSE seq gap: $prev -> $seq, refresh required")
+            lastSeq = if (prev > seq) prev else seq
+            return Accept.GAP
         }
         // 只前进不回退（重放保护已由 event_id 去重兜底）
         lastSeq = if (prev != null && prev > seq) prev else seq
-        if (prev != null && seq > prev + 1) {
-            return Accept.GAP
-        }
         return Accept.OK
     }
 
