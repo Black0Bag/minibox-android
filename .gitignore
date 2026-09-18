@@ -39,3 +39,6 @@ runtime/
 data/
 test-tmp/
 /tmp/
+# Python bytecode cache (local py_compile artifacts)
+__pycache__/
+*.pyc
