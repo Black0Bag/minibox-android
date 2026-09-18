@@ -28,12 +28,12 @@
 
 | 步骤 | 内容 | 状态 |
 | --- | --- | --- |
-| S1 | model：Session、Message DTO + SSE 会话事件解析（typed events） | 待办 |
-| S2 | data：ConversationsRepository（list/create/get/sendMessage，尾斜杠） | 待办 |
-| S3 | data：ChatStreamRepository（SseClient 重连 + 去重 + 类型化事件 Flow） | 待办 |
-| S4 | data：ApprovalsRepository（POST /approvals/{run_id}） | 待办 |
-| S5 | navigation：ConversationsKey + ChatKey 路由 | 待办 |
-| S6 | feature/conversations：会话列表屏 | 待办 |
-| S7 | feature/chat：聊天屏（消息 + 输入 + 运行状态 + 审批卡片） | 待办 |
-| S8 | 测试：DTO 序列化、Repository Mock、SSE 事件解析/去重 | 待办 |
-| S9 | 版本 0.2.0 + CHANGELOG + 文档回填 + 提交推送 | 待办 |
+| S1 | model：Session、Message DTO + SSE 会话事件解析（typed events） | [DONE] |
+| S2 | data：ConversationsRepository（list/create/get/sendMessage，尾斜杠） | [DONE] |
+| S3 | data：ChatStreamRepository（SseClient 重连 + 去重 + 类型化事件 Flow） | [DONE] |
+| S4 | data：ApprovalsRepository（POST /approvals/{run_id}） | [DONE]（并入 ConversationsRepository.submitApproval） |
+| S5 | navigation：ConversationsKey + ChatKey 路由 | [DONE] |
+| S6 | feature/conversations：会话列表屏 | [DONE] |
+| S7 | feature/chat：聊天屏（消息 + 输入 + 运行状态 + 审批卡片） | [DONE] |
+| S8 | 测试：DTO 序列化、Repository Mock、SSE 事件解析/去重 | [DONE] |
+| S9 | 版本 0.2.0 + CHANGELOG + 文档回填 + 提交推送 | [DONE] |

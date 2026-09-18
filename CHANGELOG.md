@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.2.0 - 2026-09-19
+
+- F1 (conversations + SSE chat loop):
+  - core/model: Session, Message, SendChatMessage, SendMessageResult, ApprovalResult,
+    ChatEvent (typed SSE events) + ChatEventMapper
+  - core/network: RestClient generic get/post (trailing-slash aware)
+  - data: ConversationsRepository (list/create/get/sendMessage/rewind/submitApproval),
+    ChatStreamRepository (auto-reconnect with exponential backoff 1s-30s,
+    event_id dedup window 500, seq gap detection -> GapDetected, 401 stops reconnect)
+  - navigation: ConnectionKey / ConversationsKey / ChatKey routes
+  - feature/conversations: list screen + create FAB
+  - feature/chat: message list + input + running banner + approval card
+    (terminal state per agent.run_finished.state, not assistant arrival)
+  - Tests: Session DTO + ChatEventMapper fixtures, ConversationsRepository MockWebServer
+
 ## 0.1.0 - 2026-09-19
 
 - F0 (model + network + connection diagnostics):

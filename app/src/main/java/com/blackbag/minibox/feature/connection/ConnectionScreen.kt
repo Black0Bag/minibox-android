@@ -41,9 +41,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
  *
  * 交互流程（证据：BACKEND_API.md 端点表）：
  * 输入 host+port+token → 点"诊断" → /health → /ready → /server/status → 展示三步结果。
+ * 诊断通过后可进入会话列表。
  */
 @Composable
 fun ConnectionScreen(
+    onOpenConversations: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: ConnectionViewModel = viewModel()
@@ -124,6 +126,16 @@ fun ConnectionScreen(
         }
 
         // --- 结果区 ---
+
+        // 诊断全部通过后给出会话入口
+        if (state.serverStatus?.ok == true) {
+            Button(
+                onClick = onOpenConversations,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("进入会话")
+            }
+        }
 
         // Step 1: Health
         state.health?.let { health ->
