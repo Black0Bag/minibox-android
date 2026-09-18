@@ -48,12 +48,12 @@ fun loadRepositoryVersion(): RepositoryVersion {
 val repositoryVersion = loadRepositoryVersion()
 
 android {
-    namespace = "io.github.black0bag.minibox"
+    namespace = "com.blackbag.minibox"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.black0bag.minibox"
-        minSdk = 26
+        applicationId = "com.blackbag.minibox"
+        minSdk = 29
         targetSdk = 34
         versionCode = repositoryVersion.code
         versionName = repositoryVersion.name

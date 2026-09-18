@@ -1,4 +1,4 @@
-package io.github.black0bag.minibox
+package com.blackbag.minibox
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

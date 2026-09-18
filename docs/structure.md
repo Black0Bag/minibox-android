@@ -39,8 +39,8 @@ Compose → ViewModel → Repository → REST/SSE/WS → Go 后端；事件反�
 
 ## 关键入口文件
 
-- `app/src/main/java/io/github/black0bag/minibox/MiniboxApplication.kt`（已创建，F0）
-- `app/src/main/java/io/github/black0bag/minibox/MainActivity.kt`（已创建，F0，临时 Compose 占位 UI）
+- `app/src/main/java/com/blackbag/minibox/MiniboxApplication.kt`（已创建，F0）
+- `app/src/main/java/com/blackbag/minibox/MainActivity.kt`（已创建，F0，临时 Compose 占位 UI）
 - 待创建：AppNavDisplay、连接 composition root（F1）。
 
 ## 工程地基落地记录（F0，2026-09-18）

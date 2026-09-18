@@ -18,7 +18,7 @@ MAX_COMPONENT = 999
 MAX_ANDROID_VERSION_CODE = 2_100_000_000
 VERSION_PATH = "VERSION"
 CHANGELOG_PATH = "CHANGELOG.md"
-APPLICATION_ID = "io.github.black0bag.minibox"
+APPLICATION_ID = "com.blackbag.minibox"
 
 
 class VersionContractError(ValueError):

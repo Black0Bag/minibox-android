@@ -8,7 +8,7 @@
 - 版本基线（沿用 minibile 已验证组合，2026-09 运行中）：
   - AGP 8.13.2 / Kotlin 2.2.21 / Gradle 8.13 / JDK 21 / Compose BOM 2026.02.01
   - compileSdk 36 / targetSdk 34 / minSdk 26
-  - applicationId：`io.github.black0bag.minibox`
+  - applicationId：`com.blackbag.minibox`
 
 ## 验收标准
 
@@ -45,6 +45,6 @@
 ## 决策记录
 
 - 不在初始化阶段引入 Navigation 3：仍处 alpha，且 F0 无路由需求；F1 引入时再验证版本（见 docs/plan.md 里程碑 2）。
-- 不复制 minibile 的 namespace（`com.ai.assistance.operit` 为其历史遗留）；minibox 使用 `io.github.black0bag.minibox`。
+- 不复制 minibile 的 namespace（`com.ai.assistance.operit` 为其历史遗留）；minibox 使用 `com.blackbag.minibox`。
 - 不复制 minibile 的 Rust/JNI/STT/WebChat/manual-deps CI 步骤：minibox 无对应组件。
 - 仓库原非标准 `wrapper/` 目录已删除，wrapper 统一放 `gradle/wrapper/`。
