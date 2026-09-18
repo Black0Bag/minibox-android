@@ -45,3 +45,4 @@ __pycache__/
 
 # 用户本地笔记目录，不入库
 docs/codebase/
+.venv/
