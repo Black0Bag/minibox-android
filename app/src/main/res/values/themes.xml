@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 零依赖主题：不引入 AppCompat/Material XML 库，Compose 自管视觉。
+         后续接入 Compose 主题体系时由 core/designsystem 统一替换。 -->
+    <style name="Theme.Minibox" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

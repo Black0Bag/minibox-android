@@ -1,0 +1,361 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, opencode]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  # 仅 PR 触发：pr_check.py 的 candidate_context 强制要求双亲 merge commit（与 minibile 机制一致），
+  # push 事件无 merge ref，跑 plan 必失败。分支级验证通过 PR 完成。
+
+concurrency:
+  group: pr-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  JAVA_VERSION: '21'
+  ANDROID_BUILD_TOOLS_VERSION: '35.0.0'
+  ANDROID_API_LEVEL: '26'
+
+jobs:
+  fast:
+    name: Fast checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      base_sha: ${{ steps.plan.outputs.base_sha }}
+      candidate_sha: ${{ steps.plan.outputs.candidate_sha }}
+      android_resources: ${{ steps.plan.outputs.android_resources }}
+      android_jvm: ${{ steps.plan.outputs.android_jvm }}
+      android_full: ${{ steps.plan.outputs.android_full }}
+
+    steps:
+      - name: Checkout merge candidate
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Plan candidate checks
+        id: plan
+        env:
+          CANDIDATE_SHA: ${{ github.sha }}
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 ci/script/pr_check.py plan \
+            --candidate "$CANDIDATE_SHA" \
+            --expected-base "$EXPECTED_BASE_SHA" \
+            --expected-head "$EXPECTED_HEAD_SHA" \
+            --github-output "$GITHUB_OUTPUT" \
+            --step-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Check release version contract
+        id: release-version
+        continue-on-error: true
+        run: |
+          python3 -B ci/script/release_version.py check-pr \
+            --base "${{ steps.plan.outputs.base_sha }}" \
+            --candidate "${{ steps.plan.outputs.candidate_sha }}"
+
+      - name: Check repository hygiene
+        id: hygiene
+        continue-on-error: true
+        run: |
+          python3 ci/script/check_repo_hygiene.py \
+            --base "${{ steps.plan.outputs.base_sha }}" \
+            --candidate "${{ steps.plan.outputs.candidate_sha }}"
+
+      - name: Check Markdown links
+        id: markdown
+        continue-on-error: true
+        run: |
+          python3 ci/script/check_markdown_links.py \
+            --base "${{ steps.plan.outputs.base_sha }}" \
+            --candidate "${{ steps.plan.outputs.candidate_sha }}"
+
+      - name: Check changed YAML and Actions workflows
+        id: yaml
+        if: steps.plan.outputs.yaml == 'true'
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ steps.plan.outputs.base_sha }}
+          CANDIDATE_SHA: ${{ steps.plan.outputs.candidate_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          yaml_list="$RUNNER_TEMP/changed-yaml.list"
+          git diff --name-only --no-renames --diff-filter=ACMRT -z \
+            "$BASE_SHA" "$CANDIDATE_SHA" -- '*.yml' '*.yaml' > "$yaml_list"
+          mapfile -d '' -t yaml_files < "$yaml_list"
+
+          workflow_list="$RUNNER_TEMP/changed-workflows.list"
+          : > "$workflow_list"
+          if (( ${#yaml_files[@]} == 0 )); then
+            echo "No added or modified YAML files."
+            exit 0
+          fi
+
+          # AST parsing validates syntax without converting valid scalars into Ruby objects.
+          ruby -rpsych -e \
+            'ARGV.each { |path| Psych.parse_file(path); puts "YAML OK: #{path}" }' \
+            -- "${yaml_files[@]}"
+
+          for path in "${yaml_files[@]}"; do
+            case "$path" in
+              .github/workflows/*.yml|.github/workflows/*.yaml)
+                printf '%s\0' "$path" >> "$workflow_list"
+                ;;
+            esac
+          done
+
+          if [[ -s "$workflow_list" ]]; then
+            mapfile -d '' -t workflow_files < "$workflow_list"
+            actionlint_archive="$RUNNER_TEMP/actionlint.tar.gz"
+            actionlint_dir="$RUNNER_TEMP/actionlint"
+            curl --fail --location --silent --show-error \
+              "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz" \
+              --output "$actionlint_archive"
+            echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  $actionlint_archive" \
+              | sha256sum --check --strict
+            mkdir -p "$actionlint_dir"
+            tar -xzf "$actionlint_archive" -C "$actionlint_dir"
+            "$actionlint_dir/actionlint" "${workflow_files[@]}"
+          fi
+
+      - name: Set up Android SDK
+        if: steps.plan.outputs.android_resources == 'true'
+        uses: android-actions/setup-android@v4
+        with:
+          # 新版 SDK 已移除 `tools` 包；只装 platform-tools，其余包由后续 sdkmanager 安装。
+          packages: 'platform-tools'
+
+      - name: Install required Android toolchain
+        if: steps.plan.outputs.android_resources == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          packages=("build-tools;$ANDROID_BUILD_TOOLS_VERSION")
+          sdkmanager --install "${packages[@]}"
+
+      - name: Compile changed Android resources
+        if: steps.plan.outputs.android_resources == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/compiled-app-resources.zip"
+          "$ANDROID_HOME/build-tools/$ANDROID_BUILD_TOOLS_VERSION/aapt2" compile \
+            --dir app/src/main/res \
+            -o "$output"
+          test -s "$output"
+
+      - name: Require successful fast checks
+        if: always()
+        env:
+          PLAN_OUTCOME: ${{ steps.plan.outcome }}
+          RELEASE_VERSION_OUTCOME: ${{ steps.release-version.outcome }}
+          HYGIENE_OUTCOME: ${{ steps.hygiene.outcome }}
+          MARKDOWN_OUTCOME: ${{ steps.markdown.outcome }}
+          YAML_OUTCOME: ${{ steps.yaml.outcome }}
+          YAML_REQUIRED: ${{ steps.plan.outputs.yaml }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          failures=0
+
+          check_stage() {
+            local name="$1"
+            local required="$2"
+            local outcome="$3"
+            printf '| <code>%s</code> | <code>%s</code> | <code>%s</code> |\n' \
+              "$name" "$required" "$outcome" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$required" == "true" && "$outcome" != "success" ]]; then
+              echo "Required fast check failed: $name ($outcome)" >&2
+              failures=$((failures + 1))
+            fi
+          }
+
+          {
+            echo "## Fast check decision"
+            echo
+            echo '| Stage | Required | Outcome |'
+            echo '| --- | --- | --- |'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          check_stage candidate true "$PLAN_OUTCOME"
+          check_stage release-version true "$RELEASE_VERSION_OUTCOME"
+          check_stage hygiene true "$HYGIENE_OUTCOME"
+          check_stage markdown true "$MARKDOWN_OUTCOME"
+          check_stage yaml "$YAML_REQUIRED" "$YAML_OUTCOME"
+
+          if (( failures > 0 )); then
+            exit 1
+          fi
+
+  android_build:
+    name: Android build
+    needs: fast
+    if: >-
+      needs.fast.result == 'success' &&
+      needs.fast.outputs.android_full == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout merge candidate
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+
+      - name: Install required Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-34" \
+            "platforms;android-36" \
+            "build-tools;$ANDROID_BUILD_TOOLS_VERSION"
+
+      - name: Configure secret-free Android build
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      - name: Run Android build
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: minibox-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  android_tests:
+    name: Android JVM tests
+    needs: fast
+    if: >-
+      needs.fast.result == 'success' &&
+      (needs.fast.outputs.android_jvm == 'true' || needs.fast.outputs.android_full == 'true')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout merge candidate
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+
+      - name: Install required Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-34" \
+            "platforms;android-36" \
+            "build-tools;$ANDROID_BUILD_TOOLS_VERSION"
+
+      - name: Configure secret-free Android build
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      - name: Run Android JVM tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew :app:testDebugUnitTest --stacktrace --no-daemon
+
+  candidate:
+    name: Candidate checks
+    needs: [fast, android_build, android_tests]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Require selected checks
+        env:
+          FAST_RESULT: ${{ needs.fast.result }}
+          ANDROID_BUILD_REQUIRED: ${{ needs.fast.result == 'success' && needs.fast.outputs.android_full == 'true' }}
+          ANDROID_BUILD_RESULT: ${{ needs.android_build.result }}
+          ANDROID_TESTS_REQUIRED: ${{ needs.fast.result == 'success' && (needs.fast.outputs.android_jvm == 'true' || needs.fast.outputs.android_full == 'true') }}
+          ANDROID_TESTS_RESULT: ${{ needs.android_tests.result }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          failures=0
+
+          check_stage() {
+            local name="$1"
+            local required="$2"
+            local outcome="$3"
+            printf '| <code>%s</code> | <code>%s</code> | <code>%s</code> |\n' \
+              "$name" "$required" "$outcome" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$required" == "true" && "$outcome" != "success" ]]; then
+              echo "Required check failed: $name ($outcome)" >&2
+              failures=$((failures + 1))
+            fi
+          }
+
+          {
+            echo "## Candidate check decision"
+            echo
+            echo '| Stage | Required | Outcome |'
+            echo '| --- | --- | --- |'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          check_stage fast true "$FAST_RESULT"
+          check_stage android-build "$ANDROID_BUILD_REQUIRED" "$ANDROID_BUILD_RESULT"
+          check_stage android-jvm-tests "$ANDROID_TESTS_REQUIRED" "$ANDROID_TESTS_RESULT"
+
+          if (( failures > 0 )); then
+            exit 1
+          fi
