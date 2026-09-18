@@ -34,7 +34,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.navigation3.androidViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * 连接诊断屏。
@@ -46,7 +46,7 @@ import androidx.lifecycle.viewmodel.navigation3.androidViewModel
 fun ConnectionScreen(
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: ConnectionViewModel = androidViewModel()
+    val viewModel: ConnectionViewModel = viewModel()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var showToken by remember { mutableStateOf(false) }
 
