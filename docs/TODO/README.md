@@ -4,9 +4,7 @@
 
 ## 活跃任务
 
-| 任务 | 作用域 | 状态 | 索引 |
-| --- | --- | --- | --- |
-| [f1-conversations-chat](f1-conversations-chat/index.md) | 会话 + SSE 聊天闭环 | 进行中 | [index](f1-conversations-chat/index.md) |
+（暂无）
 
 ## 已完成
 
@@ -14,3 +12,4 @@
 | --- | --- | --- |
 | f0-engine-scaffold | 工程地基：构建、CI、版本契约 | [index](f0-engine-scaffold/index.md) |
 | f0-model-network | 模型 + 网络 + 连接诊断 | [index](f0-model-network/index.md) |
+| f1-conversations-chat | 会话 + SSE 聊天闭环 | [index](f1-conversations-chat/index.md) |

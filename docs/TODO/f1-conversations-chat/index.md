@@ -1,7 +1,7 @@
 # F1: 会话 + SSE 聊天闭环
 
 - 作用域: Android 首版聊天功能：会话管理 + SSE 事件流 + 消息收发 + 审批
-- 状态: 进行中
+- 状态: 已完成（PR #3 已合并 main，v0.2.0，CI 全绿）
 - 分支: feature/f1-conversations-chat
 - 版本: 0.1.0 → 0.2.0
 
