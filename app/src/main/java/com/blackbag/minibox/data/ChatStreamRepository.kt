@@ -8,6 +8,7 @@ import com.blackbag.minibox.core.network.SseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -96,9 +97,12 @@ class ChatStreamRepository(
 
         val seq = envelope.seq ?: return Accept.OK
         val prev = lastSeq
-        lastSeq = maxOf(prev ?: seq, seq)
         if (prev != null && seq > prev + 1) {
             Log.w(TAG, "SSE seq gap: $prev -> $seq, refresh required")
+        }
+        // 只前进不回退（重放保护已由 event_id 去重兜底）
+        lastSeq = if (prev != null && prev > seq) prev else seq
+        if (prev != null && seq > prev + 1) {
             return Accept.GAP
         }
         return Accept.OK

@@ -63,8 +63,9 @@ fun ConversationsScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { viewModel.createSession(onCreated = onOpenChat) },
-                enabled = !state.creating,
+                onClick = {
+                    if (!state.creating) viewModel.createSession(onCreated = onOpenChat)
+                },
             ) {
                 if (state.creating) {
                     CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))

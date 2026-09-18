@@ -2,6 +2,7 @@ package com.blackbag.minibox.core.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 
 /**
@@ -163,11 +164,11 @@ object ChatEventData {
     fun toolName(data: JsonObject): String? = str(data, "tool_name")
 
     fun approved(data: JsonObject): Boolean? {
-        val primitive = data["approved"] ?: return null
+        val primitive = data["approved"] as? JsonPrimitive ?: return null
         return if (primitive.isString) {
             primitive.content.toBooleanStrictOrNull()
         } else {
-            primitive.toString().toBooleanStrictOrNull()
+            primitive.content.toBooleanStrictOrNull()
         }
     }
 
@@ -176,7 +177,7 @@ object ChatEventData {
     fun error(data: JsonObject): String? = str(data, "error")
 
     private fun str(data: JsonObject, key: String): String? {
-        val primitive = data[key] ?: return null
+        val primitive = data[key] as? JsonPrimitive ?: return null
         if (!primitive.isString) return null
         return primitive.content
     }

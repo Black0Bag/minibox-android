@@ -100,7 +100,8 @@ class RestClient(
             return Result.NetworkFailure(e.message ?: "网络连接失败")
         }
 
-        response.use {
+        // use 是 inline：lambda 返回值即为 use 的返回值，这里显式 return
+        return response.use {
             if (it.isSuccessful) {
                 val body = it.body?.string() ?: return Result.NetworkFailure("空响应体")
                 val envelope = json.decodeFromString<Envelope>(body)
