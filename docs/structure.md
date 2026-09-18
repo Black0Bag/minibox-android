@@ -39,7 +39,16 @@ Compose → ViewModel → Repository → REST/SSE/WS → Go 后端；事件反�
 
 ## 关键入口文件
 
-待创建：Application、MainActivity、AppNavDisplay、连接 composition root。
+- `app/src/main/java/io/github/black0bag/minibox/MiniboxApplication.kt`（已创建，F0）
+- `app/src/main/java/io/github/black0bag/minibox/MainActivity.kt`（已创建，F0，临时 Compose 占位 UI）
+- 待创建：AppNavDisplay、连接 composition root（F1）。
+
+## 工程地基落地记录（F0，2026-09-18）
+
+- 构建：Gradle 8.13 wrapper + AGP 8.13.2 + Kotlin 2.2.21 + Compose BOM 2026.02.01；compileSdk 36 / targetSdk 34 / minSdk 26 / JDK 17 字节码（CI 用 JDK 21 运行）。
+- 版本契约：根目录 `VERSION`（bootstrap=0.0.0）→ `versionCode = major×1,000,000 + minor×1,000 + patch + 1`；`ci/script/release_version.py` 与 `app/build.gradle.kts` 双侧实现，CI `check-pr` 强制。
+- CI 门禁：`.github/workflows/pr-check.yml` 四阶段 fast → android_build(assembleDebug) → android_tests(testDebugUnitTest) → candidate；仅 pull_request 触发（merge ref 双亲校验）。
+- 首跑结果：PR #1 CI 全绿（run 35314481436）。
 
 ## 高风险模块
 

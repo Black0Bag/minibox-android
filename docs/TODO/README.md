@@ -4,10 +4,10 @@
 
 ## 活跃任务
 
-| 任务 | 作用域 | 状态 | 索引 |
-| --- | --- | --- | --- |
-| [f0-engine-scaffold](f0-engine-scaffold/index.md) | 工程地基：构建、CI、版本契约 | 进行中 | [index](f0-engine-scaffold/index.md) |
+（暂无）
 
 ## 已完成
 
-（暂无）
+| 任务 | 作用域 | 索引 |
+| --- | --- | --- |
+| f0-engine-scaffold | 工程地基：构建、CI、版本契约 | [index](f0-engine-scaffold/index.md) |

@@ -29,8 +29,18 @@
 | 05 | CI workflow：pr-check.yml（fast → android_build → android_tests → candidate 四阶段） | [DONE] |
 | 06 | AGENTS.md 执行准则 + docs/TODO 计划系统 | [DONE] |
 | 07 | 本地静态验证：py_compile 全部脚本、YAML 语法、release_version check-current、Gradle 配置一致性 | [DONE] |
-| 08 | 提交并推送，观察 CI 首跑结果，按报错迭代修复 | 待办 |
-| 09 | 回填 docs/structure.md 与本索引，任务标记完成 | 待办 |
+| 08 | 提交并推送，观察 CI 首跑结果，按报错迭代修复 | [DONE] |
+| 09 | 回填 docs/structure.md 与本索引，任务标记完成 | [DONE] |
+
+## 落地与迭代记录
+
+- 首跑（run 35313679176）失败：缺共享模块 `check_output.py`（hygiene/markdown 依赖）；bootstrap 契约要求初始版本 0.0.0，误用 0.1.0。
+- 修复一（e8ae4e9）：补 `check_output.py`；修复二：VERSION/CHANGELOG → 0.0.0。
+- 二跑（run 35313985249）失败：`check-pr` 校验提交历史序列，历史中存在 0.1.0→0.0.0 违反 bootstrap 语义（continue-on-error 掩盖在 step 级，汇总拦截）。
+- 修复三：filter-branch 重写 4 个提交，VERSION 自首个 F0 提交起即为 0.0.0，force-push。
+- 三跑（run 35314481436）：**全绿**。Fast checks / Android build / Android JVM tests / Candidate checks 全部 success。
+- 附带修复：误提交 `__pycache__`（已删并补 .gitignore）；workflow 移除 push 触发（candidate_context 强制双亲 merge ref）。
+- 教训：本地验证 check-pr 必须连同 git 历史一起验证，不能只看工作区当前值。
 
 ## 决策记录
 
