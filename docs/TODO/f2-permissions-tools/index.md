@@ -26,10 +26,10 @@
 
 | 步骤 | 内容 | 状态 |
 | --- | --- | --- |
-| S1 | model：PermissionsData、ToolInfo+ToolMetadata、ToolsData；RestClient.patch | 待办 |
-| S2 | data：PermissionsRepository、ToolsRepository | 待办 |
-| S3 | navigation：SettingsKey + 会话列表入口 | 待办 |
-| S4 | feature/settings：权限区（4 模式+yolo 二次确认）+ 工具区（risk_tier 标色） | 待办 |
-| S5 | feature/chat：rewind 菜单 + 轮数对话框 + 刷新 | 待办 |
-| S6 | 测试：DTO fixture + Repository MockWebServer | 待办 |
-| S7 | 版本 0.3.0 + CHANGELOG + 提交推送 | 待办 |
+| S1 | model：PermissionsData、ToolInfo+ToolMetadata、ToolsData；RestClient.patch | [DONE] |
+| S2 | data：PermissionsRepository、ToolsRepository | [DONE] |
+| S3 | navigation：SettingsKey + 会话列表入口 | [DONE] |
+| S4 | feature/settings：权限区（4 模式+yolo 二次确认）+ 工具区（risk_tier 标色） | [DONE] |
+| S5 | feature/chat：rewind 菜单 + 轮数对话框 + 刷新 | [DONE] |
+| S6 | 测试：DTO fixture + Repository MockWebServer | [DONE] |
+| S7 | 版本 0.3.0 + CHANGELOG + 提交推送 | [DONE] |

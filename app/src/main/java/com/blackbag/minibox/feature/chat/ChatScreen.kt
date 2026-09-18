@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,6 +26,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +67,8 @@ fun ChatScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var input by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
+    var showRewindDialog by remember { mutableStateOf(false) }
+    var rewindKeep by remember { mutableStateOf("5") }
 
     // 新消息到达时滚到底部
     LaunchedEffect(state.messages.size) {
@@ -82,9 +87,48 @@ fun ChatScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 },
+                actions = {
+                    IconButton(
+                        onClick = { showRewindDialog = true },
+                        enabled = !state.running && !state.loadingHistory,
+                    ) {
+                        Icon(Icons.Filled.History, contentDescription = "回退")
+                    }
+                },
             )
         },
     ) { padding ->
+        // rewind 对话框
+        if (showRewindDialog) {
+            AlertDialog(
+                onDismissRequest = { showRewindDialog = false },
+                title = { Text("回退会话") },
+                text = {
+                    Column {
+                        Text("保留最近几轮对话？（1 轮 = 1 条用户消息 + 1 条助手回答）")
+                        androidx.compose.material3.OutlinedTextField(
+                            value = rewindKeep,
+                            onValueChange = { rewindKeep = it.filter(Char::isDigit).take(3) },
+                            label = { Text("保留轮数") },
+                            singleLine = true,
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        rewindKeep.toIntOrNull()?.let { keep ->
+                            if (keep > 0) {
+                                showRewindDialog = false
+                                viewModel.rewind(keep)
+                            }
+                        }
+                    }) { Text("回退") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showRewindDialog = false }) { Text("取消") }
+                },
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()

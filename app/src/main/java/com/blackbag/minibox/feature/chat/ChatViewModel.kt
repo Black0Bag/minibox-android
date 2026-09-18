@@ -232,6 +232,24 @@ class ChatViewModel(
         }
     }
 
+    fun rewind(keep: Int) {
+        val repo = restRepo ?: return
+        viewModelScope.launch {
+            when (val result = repo.rewind(sessionId, keep)) {
+                is RestClient.Result.Ok -> loadHistory() // 回退成功后全量刷新
+                is RestClient.Result.HttpError -> _uiState.value = _uiState.value.copy(
+                    error = result.problem.detail,
+                )
+                is RestClient.Result.Unauthorized -> _uiState.value = _uiState.value.copy(
+                    unauthorized = true,
+                )
+                is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
+                    error = result.message,
+                )
+            }
+        }
+    }
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }

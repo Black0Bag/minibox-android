@@ -4,7 +4,9 @@
 
 ## 活跃任务
 
-（暂无）
+| 任务 | 作用域 | 状态 | 索引 |
+| --- | --- | --- | --- |
+| [f2-permissions-tools](f2-permissions-tools/index.md) | 权限 + 工具 + 会话回退 | 进行中 | [index](f2-permissions-tools/index.md) |
 
 ## 已完成
 
