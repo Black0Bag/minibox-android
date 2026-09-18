@@ -42,3 +42,6 @@ test-tmp/
 # Python bytecode cache (local py_compile artifacts)
 __pycache__/
 *.pyc
+
+# 用户本地笔记目录，不入库
+docs/codebase/
