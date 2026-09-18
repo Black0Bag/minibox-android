@@ -1,0 +1,92 @@
+package com.blackbag.minibox.core.network
+
+import android.util.Log
+import com.blackbag.minibox.core.model.ConnectionConfig
+import com.blackbag.minibox.core.model.Envelope
+import com.blackbag.minibox.core.model.HealthData
+import com.blackbag.minibox.core.model.ProblemDetail
+import com.blackbag.minibox.core.model.ReadyData
+import com.blackbag.minibox.core.model.ServerStatusData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromJsonElement
+import okhttp3.OkHttpClient
+import okhttp3.Request
+
+/**
+ * REST 客户端。调用 /health、/ready、/server/status。
+ *
+ * 设计：先解析 Envelope（data 为 JsonElement），再按 type 字段分发到具体 DTO。
+ * 证据：BACKEND_API.md + 后端 transport/envelope.go。
+ *
+ * 错误处理：收到 401 不自动重试，直接返回 ConnectionError.Unauthorized（BACKEND_API.md）。
+ */
+class RestClient(
+    private val client: OkHttpClient,
+    private val config: ConnectionConfig,
+) {
+    private val json = Json { ignoreUnknownKeys = true }
+    private val errorHandler = ErrorResponseHandler(json)
+
+    sealed interface Result<out T> {
+        data class Ok<T>(val value: T) : Result<T>
+        data class HttpError(val problem: ProblemDetail) : Result<Nothing>
+        data class Unauthorized(val problem: ProblemDetail) : Result<Nothing>
+        data class NetworkFailure(val message: String) : Result<Nothing>
+    }
+
+    suspend fun getHealth(): Result<HealthData> = execute("/health") { envelope ->
+        json.decodeFromJsonElement<HealthData>(envelope.data)
+    }
+
+    suspend fun getReady(): Result<ReadyData> = execute("/ready") { envelope ->
+        json.decodeFromJsonElement<ReadyData>(envelope.data)
+    }
+
+    suspend fun getServerStatus(): Result<ServerStatusData> = execute("/server/status") { envelope ->
+        json.decodeFromJsonElement<ServerStatusData>(envelope.data)
+    }
+
+    private suspend fun <T> execute(
+        path: String,
+        decoder: (Envelope) -> T,
+    ): Result<T> = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("${config.restBaseUrl}$path")
+            .get()
+            .build()
+
+        val response = try {
+            client.newCall(request).execute()
+        } catch (e: Exception) {
+            Log.e(TAG, "Network failure for $path", e)
+            return@withContext Result.NetworkFailure(e.message ?: "网络连接失败")
+        }
+
+        response.use {
+            if (it.isSuccessful) {
+                val body = it.body?.string() ?: return@withContext Result.NetworkFailure("空响应体")
+                val envelope = json.decodeFromString<Envelope>(body)
+                Result.Ok(decoder(envelope))
+            } else {
+                val error = errorHandler.parse(it)
+                when {
+                    it.code == 401 -> {
+                        val pd = (error as? ErrorResponseHandler.ApiError.Problem)?.detail
+                            ?: ProblemDetail("unauthorized", "认证失败", 401, "")
+                        Result.Unauthorized(pd)
+                    }
+                    error is ErrorResponseHandler.ApiError.Problem -> Result.HttpError(error.detail)
+                    else -> Result.HttpError(
+                        ProblemDetail("unknown", "未知错误", it.code, error.toString())
+                    )
+                }
+            }
+        }
+    }
+
+    private companion object {
+        const val TAG = "RestClient"
+    }
+}

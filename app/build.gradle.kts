@@ -89,11 +89,20 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // JVM 单元测试中 android.util.Log 等框架 API 返回默认值而非抛异常
+    // （android.jar 是 mockable stub，Log.w/d/e 在 JVM 测试中原本会 RuntimeException）
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -101,6 +110,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material3.window)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.window)
     implementation(libs.kotlinx.serialization)
     implementation(libs.coroutines.android)
@@ -108,6 +118,10 @@ dependencies {
     implementation(libs.okhttp.sse)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.datastore.preferences)
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.lifecycle.viewmodel.navigation3)
+    implementation(libs.security.crypto)
 
     debugImplementation(libs.compose.ui.tooling)
 
@@ -115,6 +129,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockwebserver)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.espresso.core)

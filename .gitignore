@@ -36,7 +36,7 @@ out/
 *.db-shm
 *.sqlite
 runtime/
-data/
+/data/
 test-tmp/
 /tmp/
 # Python bytecode cache (local py_compile artifacts)
