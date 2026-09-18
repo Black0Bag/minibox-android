@@ -108,6 +108,10 @@ dependencies {
     implementation(libs.okhttp.sse)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.datastore.preferences)
+    implementation(libs.navigation3.runtime)
+    implementation(libs.navigation3.ui)
+    implementation(libs.lifecycle.viewmodel.navigation3)
+    implementation(libs.security.crypto)
 
     debugImplementation(libs.compose.ui.tooling)
 
@@ -115,6 +119,7 @@ dependencies {
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockwebserver)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.espresso.core)

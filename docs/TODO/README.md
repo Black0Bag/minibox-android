@@ -11,3 +11,4 @@
 | 任务 | 作用域 | 索引 |
 | --- | --- | --- |
 | f0-engine-scaffold | 工程地基：构建、CI、版本契约 | [index](f0-engine-scaffold/index.md) |
+| f0-model-network | 模型 + 网络 + 连接诊断 | [index](f0-model-network/index.md) |

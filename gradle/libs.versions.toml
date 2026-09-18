@@ -15,6 +15,9 @@ coroutines-test = "1.7.3"
 okhttp = "4.12.0"
 datastore = "1.0.0"
 desugar = "2.0.4"
+nav3-core = "1.0.0"
+lifecycle-viewmodel-nav3 = "2.10.0-rc01"
+security-crypto = "1.1.0-alpha06"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -54,6 +57,14 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 # Desugaring（java.time 等在 minSdk 26 以下 API 需要）
 desugar-jdk = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 
+# Navigation 3（稳定版 1.0.0，来源：Navigation 3 skill 迁移指南）
+navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3-core" }
+navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3-core" }
+lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-viewmodel-nav3" }
+
+# 安全存储（EncryptedSharedPreferences，来源：minibile 已验证）
+security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -62,6 +73,7 @@ test-runner = { group = "androidx.test", name = "runner", version.ref = "test-ru
 test-rules = { group = "androidx.test", name = "rules", version.ref = "test-rules" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
