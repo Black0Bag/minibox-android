@@ -4,7 +4,9 @@
 
 ## 活跃任务
 
-（暂无）
+| 任务 | 作用域 | 状态 | 索引 |
+| --- | --- | --- | --- |
+| [f1-conversations-chat](f1-conversations-chat/index.md) | 会话 + SSE 聊天闭环 | 进行中 | [index](f1-conversations-chat/index.md) |
 
 ## 已完成
 
