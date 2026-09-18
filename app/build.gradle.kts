@@ -89,6 +89,14 @@ android {
     buildFeatures {
         compose = true
     }
+
+    // JVM 单元测试中 android.util.Log 等框架 API 返回默认值而非抛异常
+    // （android.jar 是 mockable stub，Log.w/d/e 在 JVM 测试中原本会 RuntimeException）
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
