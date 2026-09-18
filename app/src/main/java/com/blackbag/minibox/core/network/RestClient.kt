@@ -11,8 +11,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
  * REST 客户端。调用 /health、/ready、/server/status。
@@ -48,6 +50,32 @@ class RestClient(
         json.decodeFromJsonElement<ServerStatusData>(envelope.data)
     }
 
+    /**
+     * 通用 GET。路径基于 restBaseUrl（已含 /api/v1）。
+     * 集合路径调用方负责保留尾斜杠（后端 docs/api.md §10）。
+     */
+    suspend fun <T> get(
+        path: String,
+        decoder: (Envelope) -> T,
+    ): Result<T> = execute(path, decoder)
+
+    /**
+     * 通用 POST。bodyJson 为请求体 JSON 文本（空体传 "{}"）。
+     */
+    suspend fun <T> post(
+        path: String,
+        bodyJson: String,
+        decoder: (Envelope) -> T,
+    ): Result<T> = withContext(Dispatchers.IO) {
+        val body = bodyJson.toRequestBody("application/json; charset=utf-8".toMediaType())
+        val request = Request.Builder()
+            .url("${config.restBaseUrl}$path")
+            .post(body)
+            .build()
+
+        doCall(path, request, decoder)
+    }
+
     private suspend fun <T> execute(
         path: String,
         decoder: (Envelope) -> T,
@@ -57,16 +85,25 @@ class RestClient(
             .get()
             .build()
 
+        doCall(path, request, decoder)
+    }
+
+    private fun <T> doCall(
+        path: String,
+        request: Request,
+        decoder: (Envelope) -> T,
+    ): Result<T> {
         val response = try {
             client.newCall(request).execute()
         } catch (e: Exception) {
             Log.e(TAG, "Network failure for $path", e)
-            return@withContext Result.NetworkFailure(e.message ?: "网络连接失败")
+            return Result.NetworkFailure(e.message ?: "网络连接失败")
         }
 
-        response.use {
+        // use 是 inline：lambda 返回值即为 use 的返回值，这里显式 return
+        return response.use {
             if (it.isSuccessful) {
-                val body = it.body?.string() ?: return@withContext Result.NetworkFailure("空响应体")
+                val body = it.body?.string() ?: return Result.NetworkFailure("空响应体")
                 val envelope = json.decodeFromString<Envelope>(body)
                 Result.Ok(decoder(envelope))
             } else {
