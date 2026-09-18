@@ -66,11 +66,27 @@ class RestClient(
         path: String,
         bodyJson: String,
         decoder: (Envelope) -> T,
+    ): Result<T> = doWithBody(path, bodyJson, "POST", decoder)
+
+    /**
+     * 通用 PATCH。bodyJson 为请求体 JSON 文本。
+     */
+    suspend fun <T> patch(
+        path: String,
+        bodyJson: String,
+        decoder: (Envelope) -> T,
+    ): Result<T> = doWithBody(path, bodyJson, "PATCH", decoder)
+
+    private suspend fun <T> doWithBody(
+        path: String,
+        bodyJson: String,
+        method: String,
+        decoder: (Envelope) -> T,
     ): Result<T> = withContext(Dispatchers.IO) {
         val body = bodyJson.toRequestBody("application/json; charset=utf-8".toMediaType())
         val request = Request.Builder()
             .url("${config.restBaseUrl}$path")
-            .post(body)
+            .method(method, body)
             .build()
 
         doCall(path, request, decoder)

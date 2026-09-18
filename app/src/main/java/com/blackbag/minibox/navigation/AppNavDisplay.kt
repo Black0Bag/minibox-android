@@ -9,6 +9,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.blackbag.minibox.feature.chat.ChatScreen
 import com.blackbag.minibox.feature.connection.ConnectionScreen
 import com.blackbag.minibox.feature.conversations.ConversationsScreen
+import com.blackbag.minibox.feature.settings.SettingsScreen
 
 /**
  * Navigation 3 根显示。
@@ -29,6 +30,9 @@ data object ConnectionKey
 
 /** 会话列表路由 key */
 data object ConversationsKey
+
+/** 设置路由 key（权限模式 + 工具列表） */
+data object SettingsKey
 
 /** 聊天路由 key（携带会话 ID） */
 data class ChatKey(val sessionId: String)
@@ -60,6 +64,12 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
                     ConversationsScreen(
                         onBack = ::goBack,
                         onOpenChat = { sessionId -> navigate(ChatKey(sessionId)) },
+                        onOpenSettings = { navigate(SettingsKey) },
+                    )
+                }
+                is SettingsKey -> NavEntry(key) {
+                    SettingsScreen(
+                        onBack = ::goBack,
                     )
                 }
                 is ChatKey -> NavEntry(key) {

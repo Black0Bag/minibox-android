@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.3.0 - 2026-09-19
+
+- F2 (permissions + tools + rewind):
+  - core/model: PermissionsData, ToolMetadata, ToolInfo, ToolsData
+  - core/network: RestClient.patch (generic PATCH)
+  - data: PermissionsRepository (get/setMode), ToolsRepository (list)
+  - navigation: SettingsKey route; settings entry on conversations top bar
+  - feature/settings: permission mode chips (yolo double-confirm + persistent
+    high-risk banner), tools list with risk_tier coloring and metadata badges
+  - feature/chat: rewind menu + rounds dialog (full refresh after rewind)
+  - Tests: Permissions/Tools DTO fixtures, MockWebServer (PATCH method,
+    trailing slash, invalid_mode 400 -> HttpError)
+- Not exposed (by policy): /tools/acquire, /upgrade/* (high-risk, out of
+  first-version UI scope per AGENTS.md)
+
 ## 0.2.0 - 2026-09-19
 
 - F1 (conversations + SSE chat loop):
