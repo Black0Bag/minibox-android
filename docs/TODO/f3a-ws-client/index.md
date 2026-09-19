@@ -39,3 +39,4 @@
 | S5 | navigation：DeviceKey + ConnectionScreen 入口 | [DONE] |
 | S6 | 测试：JSON-RPC 帧序列化 + MockWebServer WS 升级（握手/心跳/pending 归属/断线重连） | [DONE] |
 | S7 | 版本 0.5.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | [DONE] |
+# F3a WS test fix applied 1789790076
