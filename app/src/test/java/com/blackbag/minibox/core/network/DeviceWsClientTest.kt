@@ -2,7 +2,7 @@ package com.blackbag.minibox.core.network
 
 import com.blackbag.minibox.core.model.ConnectionConfig
 import com.blackbag.minibox.core.model.DeviceHelloParams
-import com.blackbag.minibox.core.model.DeviceWsState
+import com.blackbag.minibox.core.network.DeviceWsState
 import com.blackbag.minibox.core.model.RpcErrorCodes
 import com.blackbag.minibox.core.model.RpcFrames
 import com.blackbag.minibox.core.model.RpcResponse
@@ -134,12 +134,12 @@ class DeviceWsClientTest {
         assertTrue(client?.state?.value is DeviceWsState.Ready)
 
         // 验证 connect 帧包含 auth 与 protocol
-        val connectFrame = awaitFrame { it.contains(""""method":"connect"""") }
+        val connectFrame = awaitFrame(matcher = { frame -> frame.contains(""""method":"connect"""") })
         assertTrue(connectFrame.contains(""""auth":"device-token""""))
         assertTrue(connectFrame.contains(""""protocol":"1.0""""))
 
         // 验证 device.hello 外层/内层结构
-        val helloFrame = awaitFrame { it.contains(""""method":"device"""") }
+        val helloFrame = awaitFrame(matcher = { frame -> frame.contains(""""method":"device"""") })
         assertTrue(helloFrame.contains(""""method":"hello""""))
         assertTrue(helloFrame.contains(""""id":"d1""""))
     }
