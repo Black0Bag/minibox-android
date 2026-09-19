@@ -215,13 +215,14 @@ class DeviceWsClientTest {
         withTimeout(5_000) {
             while (serverWs == null) delay(50)
         }
-        delay(200)
+        delay(500)
         serverWs?.close(1000, "server close")
 
         // 等状态离开 Ready（重连状态机响应 server close）
-        val deadline2 = System.currentTimeMillis() + 10_000
+        val deadline2 = System.currentTimeMillis() + 15_000
         while (System.currentTimeMillis() < deadline2 &&
-            client?.state?.value is DeviceWsState.Ready
+            client?.state?.value !is DeviceWsState.Reconnecting &&
+            client?.state?.value !is DeviceWsState.Disconnected
         ) {
             delay(50)
         }

@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.2 - 2026-09-20
+
+- DeviceWsClientTest: fix flaky server-close test (poll for Reconnecting/Disconnected state, increase pre-close delay)
+
 ## 0.5.1 - 2026-09-20
 
 - Remove ConnectionPool(0,0,NANOSECONDS) from DeviceWsClientTest that caused IllegalArgumentException on CI
