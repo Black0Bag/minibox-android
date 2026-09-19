@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.0 - 2026-09-19
+
+- F3a (device WS transport, stage-2 leftover per ROADMAP):
+  - core/model: RpcRequest/RpcResponse/RpcError (JSON-RPC 2.0), RpcErrorCodes
+    (-32001..-32005), DeviceOuterRequest, DeviceHelloParams, RpcFrames
+    (encode/decode/redactAuth — logs never print auth token)
+  - core/network: DeviceWsClient — state machine (Disconnected→Connecting→
+    Handshaking→Ready→Reconnecting), unique-id pending map (responses resolve
+    by id, not arrival order), single read loop + serialized writer via
+    Channel, heartbeat.ping every 30s (10s timeout → close → reconnect with
+    exponential backoff 1s→30s, re-handshake + re-hello), connect() first
+    frame {client, protocol 1.0, auth}
+  - core/security: CredentialStore.deviceToken (Keystore-backed)
+  - navigation: DeviceKey; device entry on connection screen (after diagnose)
+  - feature/device: token input (masked) + connect/disconnect + state label
+    + heartbeat RTT display
+  - Tests: RPC frame fixtures (8), MockWebServer WS upgrade integration
+    (handshake+hello → Ready, pending by id, not-connected → -32003,
+    server close → leaves Ready)
+- Out of scope (F3 main): 18 device executors, foreground service, command
+  approval UI, real-device side effects
+
 ## 0.4.0 - 2026-09-19
 
 - F2b (knowledge base, plan.md F2 second half):

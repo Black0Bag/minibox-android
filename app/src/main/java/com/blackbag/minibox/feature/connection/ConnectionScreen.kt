@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun ConnectionScreen(
     onOpenConversations: () -> Unit,
+    onOpenDevice: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: ConnectionViewModel = viewModel()
@@ -127,13 +128,19 @@ fun ConnectionScreen(
 
         // --- 结果区 ---
 
-        // 诊断全部通过后给出会话入口
+        // 诊断全部通过后给出会话/设备入口
         if (state.serverStatus?.ok == true) {
             Button(
                 onClick = onOpenConversations,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("进入会话")
+            }
+            Button(
+                onClick = onOpenDevice,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("设备连接")
             }
         }
 

@@ -18,4 +18,7 @@ data class ConnectionConfig(
 
     /** SSE 流 URL，如 http://192.168.1.100:8080/api/v1/stream */
     fun sseUrl(sessionId: String): String = "$restBaseUrl/stream?session_id=$sessionId"
+
+    /** 设备 WS URL（证据：websocket.md）ws://host:port/device/ws */
+    fun wsUrl(): String = "ws://$host:$port/device/ws"
 }
