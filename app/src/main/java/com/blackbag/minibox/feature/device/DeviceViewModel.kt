@@ -5,8 +5,8 @@ import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.blackbag.minibox.core.model.DeviceHelloParams
-import com.blackbag.minibox.core.model.DeviceWsState
 import com.blackbag.minibox.core.network.DeviceWsClient
+import com.blackbag.minibox.core.network.DeviceWsState
 import com.blackbag.minibox.core.network.MiniboxHttpClient
 import com.blackbag.minibox.core.security.CredentialStore
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,6 +1,7 @@
 package com.blackbag.minibox.core.network
 
 import android.util.Log
+import com.blackbag.minibox.core.model.ConnectionConfig
 import com.blackbag.minibox.core.model.DeviceHelloParams
 import com.blackbag.minibox.core.model.RpcErrorCodes
 import com.blackbag.minibox.core.model.RpcFrames
