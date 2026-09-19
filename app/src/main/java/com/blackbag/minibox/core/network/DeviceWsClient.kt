@@ -168,13 +168,15 @@ class DeviceWsClient(
         override fun onOpen(webSocket: WebSocket, response: Response) {
             _state.value = DeviceWsState.Handshaking
             // 首帧握手（websocket.md 首帧握手）
+            val connectId = nextId("connect-")
+            pending[connectId] = CompletableDeferred()
             val connectParams = buildJsonObject {
                 put("client", "android-device")
                 put("protocol", "1.0")
                 put("auth", deviceToken) // 日志经 redactAuth 打码
             }
             sendFrame(
-                RpcRequest(id = nextId("connect-"), method = "connect", params = connectParams),
+                RpcRequest(id = connectId, method = "connect", params = connectParams),
             )
         }
 
@@ -227,9 +229,11 @@ class DeviceWsClient(
             hello,
         )
         val innerElement = RpcFrames.json.parseToJsonElement(inner)
+        val helloId = nextId("hello-")
+        pending[helloId] = CompletableDeferred()
         sendFrame(
             RpcRequest(
-                id = nextId("hello-"),
+                id = helloId,
                 method = "device",
                 params = buildJsonObject {
                     put("method", "hello")
