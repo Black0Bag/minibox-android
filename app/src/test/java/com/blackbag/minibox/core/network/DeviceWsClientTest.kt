@@ -191,9 +191,9 @@ class DeviceWsClientTest {
         client = DeviceWsClient(config, OkHttpClient(), scope)
         client!!.connect("device-token", DeviceHelloParams(id = "d1", model = "t", android = "15"))
 
-        // 轮询等待 Ready（不用 withTimeout 避免 TimeoutCancellationException 泄漏）
-        val deadline = System.currentTimeMillis() + 15_000
-        while (System.currentTimeMillis() < deadline &&
+        // 轮询等待 Ready（不用 withTimeout 避免 TimeoutCancellationException）
+        val deadline1 = System.currentTimeMillis() + 15_000
+        while (System.currentTimeMillis() < deadline1 &&
             client?.state?.value !is DeviceWsState.Ready
         ) {
             delay(100)
@@ -212,12 +212,17 @@ class DeviceWsClientTest {
         delay(200)
         serverWs?.close(1000, "server close")
 
-        withTimeout(10_000) {
-            while (client?.state?.value is DeviceWsState.Ready) delay(50)
+        // 轮询等待离开 Ready（不用 withTimeout）
+        val deadline2 = System.currentTimeMillis() + 10_000
+        while (System.currentTimeMillis() < deadline2 &&
+            client?.state?.value is DeviceWsState.Ready
+        ) {
+            delay(50)
         }
+        val s = client?.state?.value
         assertTrue(
-            client?.state?.value is DeviceWsState.Reconnecting ||
-                client?.state?.value is DeviceWsState.Disconnected,
+            "expected Reconnecting/Disconnected after server close, got $s",
+            s is DeviceWsState.Reconnecting || s is DeviceWsState.Disconnected,
         )
     }
 }
