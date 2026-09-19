@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.3 - 2026-09-20
+
+- DeviceWsClient: add onClosing override to handle server-initiated close immediately
+- DeviceWsClientTest: robust polling for Reconnecting/Disconnected state
+
 ## 0.5.2 - 2026-09-20
 
 - DeviceWsClientTest: fix flaky server-close test (poll for Reconnecting/Disconnected state, increase pre-close delay)

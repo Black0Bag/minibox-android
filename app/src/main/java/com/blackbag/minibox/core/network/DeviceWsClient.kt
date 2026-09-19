@@ -209,6 +209,12 @@ class DeviceWsClient(
             }
         }
 
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            Log.w(TAG, "ws closing code=$code reason=$reason")
+            webSocket.close(code, reason)
+            onTransportDown()
+        }
+
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             Log.w(TAG, "ws closed code=$code")
             onTransportDown()
