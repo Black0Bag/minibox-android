@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.1 - 2026-09-20
+
+- Remove ConnectionPool(0,0,NANOSECONDS) from DeviceWsClientTest that caused IllegalArgumentException on CI
+
 ## 0.5.0 - 2026-09-19
 
 - F3a (device WS transport, stage-2 leftover per ROADMAP):
