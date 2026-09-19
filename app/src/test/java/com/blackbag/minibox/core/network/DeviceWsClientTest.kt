@@ -96,9 +96,9 @@ class DeviceWsClientTest {
 
     @After
     fun tearDown() {
-        client?.disconnect()
+        try { client?.disconnect() } catch (_: Exception) {}
         scope.cancel()
-        server.shutdown()
+        try { server.shutdown() } catch (_: Exception) {}
     }
 
     private fun enqueueWsUpgrade() {
@@ -161,15 +161,28 @@ class DeviceWsClientTest {
 
     @Test
     fun `request timeout returns -32004 when server silent`() = runBlocking {
-        // 不自动应答 heartbeat 的服务器
-        val silentListener = object : WebSocketListener() {}
-        server.enqueue(MockResponse().withWebSocketUpgrade(silentListener))
+        // 服务端只应答 connect/hello，不对 heartbeat 响应 → request 超时
+        val semiSilentListener = object : WebSocketListener() {
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                val id = extractId(text)
+                when {
+                    text.contains(""""method":"connect"""") -> {
+                        webSocket.send("""{"jsonrpc":"2.0","id":"$id","result":{"ok":true,"protocol":"1.0"}}""")
+                    }
+                    text.contains(""""method":"device"""") -> {
+                        webSocket.send("""{"jsonrpc":"2.0","id":"$id","result":{"ok":true}}""")
+                    }
+                    // heartbeat.ping: 不应答 → 超时
+                }
+            }
+        }
+        server.enqueue(MockResponse().withWebSocketUpgrade(semiSilentListener))
         client = DeviceWsClient(config, OkHttpClient(), scope)
+        client!!.connect("device-token", DeviceHelloParams(id = "d1", model = "t", android = "15"))
+        awaitReady()
 
-        // 握手无人应答 → connect() 挂起直到内部超时调度重连；直接测 request 超时路径
-        // 简化：不发 connect，直接验证 request() 在未连接时返回 DEVICE_OFFLINE
         val resp = client!!.request("heartbeat.ping", timeoutMs = 500)
-        assertEquals(RpcErrorCodes.DEVICE_OFFLINE, resp.error?.code)
+        assertEquals(RpcErrorCodes.TIMEOUT, resp.error?.code)
     }
 
     @Test

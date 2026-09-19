@@ -329,6 +329,17 @@ class DeviceWsClient(
         idPrefix: String = "req-",
         timeoutMs: Long = REQUEST_TIMEOUT_MS,
     ): RpcResponse {
+        // 未连接时直接返回 DEVICE_OFFLINE，不进队列等待
+        if (_state.value !is DeviceWsState.Ready) {
+            return RpcResponse(
+                jsonrpc = "2.0",
+                id = idPrefix + idCounter.incrementAndGet(),
+                error = com.blackbag.minibox.core.model.RpcError(
+                    code = RpcErrorCodes.DEVICE_OFFLINE,
+                    message = "not connected",
+                ),
+            )
+        }
         val id = nextId(idPrefix)
         val deferred = CompletableDeferred<RpcResponse>()
         pending[id] = deferred
