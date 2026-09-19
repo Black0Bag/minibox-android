@@ -6,7 +6,7 @@
 
 | 任务 | 作用域 | 状态 | 索引 |
 | --- | --- | --- | --- |
-| [f2-permissions-tools](f2-permissions-tools/index.md) | 权限 + 工具 + 会话回退 | 进行中 | [index](f2-permissions-tools/index.md) |
+| [f2b-knowledge-base](f2b-knowledge-base/index.md) | 知识库（plan.md F2 后半） | 进行中 | [index](f2b-knowledge-base/index.md) |
 
 ## 已完成
 

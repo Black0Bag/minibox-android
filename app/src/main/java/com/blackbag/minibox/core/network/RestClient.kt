@@ -77,6 +77,21 @@ class RestClient(
         decoder: (Envelope) -> T,
     ): Result<T> = doWithBody(path, bodyJson, "PATCH", decoder)
 
+    /**
+     * 通用 DELETE（空体）。
+     */
+    suspend fun <T> delete(
+        path: String,
+        decoder: (Envelope) -> T,
+    ): Result<T> = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("${config.restBaseUrl}$path")
+            .delete()
+            .build()
+
+        doCall(path, request, decoder)
+    }
+
     private suspend fun <T> doWithBody(
         path: String,
         bodyJson: String,

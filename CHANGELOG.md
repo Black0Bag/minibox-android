@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.4.0 - 2026-09-19
+
+- F2b (knowledge base, plan.md F2 second half):
+  - core/model: KnowledgeEntry, KbSearchHit (flattened Hit), KbSearchRequest,
+    KbListData, KbOkResult, CompileJob (pending/processing/ready/failed),
+    KbCompileRequest, KbUpdateRequest
+  - core/network: RestClient.delete (generic DELETE)
+  - data: KnowledgeRepository (search/list/get/create/update/delete/compile/job)
+  - navigation: KnowledgeKey + KnowledgeEntryKey; knowledge card on settings
+  - feature/knowledge: three-tab screen (search with score/match_type badges,
+    paged entries with load-more, compile with bounded polling 2s x90),
+    entry detail (edit content/source/tags/importance + delete confirm),
+    create dialog (content required)
+- Explicitly out of plan scope: /kb/distill, /kb/snapshots, /kb/rollback
+- Tests: Knowledge DTO fixtures, MockWebServer (search body, query params,
+  PATCH/DELETE methods, compile job paths)
+
 ## 0.3.0 - 2026-09-19
 
 - F2 (permissions + tools + rewind):
