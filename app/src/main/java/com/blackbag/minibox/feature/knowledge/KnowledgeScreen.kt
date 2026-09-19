@@ -340,7 +340,11 @@ private fun CreateEntryDialog(
 }
 
 @Composable
-private fun ErrorBanner(text: String, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+private fun ErrorBanner(
+    text: String,
+    onDismiss: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+) {
     Card(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
@@ -356,7 +360,9 @@ private fun ErrorBanner(text: String, onDismiss: () -> Unit, modifier: Modifier 
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 modifier = Modifier.weight(1f),
             )
-            TextButton(onClick = onDismiss) { Text("知道了") }
+            if (onDismiss != null) {
+                TextButton(onClick = onDismiss) { Text("知道了") }
+            }
         }
     }
 }
