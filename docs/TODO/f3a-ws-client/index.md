@@ -32,10 +32,10 @@
 
 | 步骤 | 内容 | 状态 |
 | --- | --- | --- |
-| S1 | model：JsonRpcFrame（请求/响应/错误）、错误码常量 | 待办 |
-| S2 | core/network：DeviceWsClient（状态机+单读循环+写队列+pending map+心跳+指数退避重连） | 待办 |
-| S3 | core/security：CredentialStore 扩展 deviceToken | 待办 |
-| S4 | feature/device：DeviceScreen（token 输入+连接控制+状态+心跳延迟显示） | 待办 |
-| S5 | navigation：DeviceKey + ConnectionScreen 入口 | 待办 |
-| S6 | 测试：JSON-RPC 帧序列化 + MockWebServer WS 升级（握手/心跳/pending 归属/断线重连） | 待办 |
-| S7 | 版本 0.5.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | 待办 |
+| S1 | model：JsonRpcFrame（请求/响应/错误）、错误码常量 | [DONE] |
+| S2 | core/network：DeviceWsClient（状态机+单读循环+写队列+pending map+心跳+指数退避重连） | [DONE] |
+| S3 | core/security：CredentialStore 扩展 deviceToken | [DONE] |
+| S4 | feature/device：DeviceScreen（token 输入+连接控制+状态+心跳延迟显示） | [DONE] |
+| S5 | navigation：DeviceKey + ConnectionScreen 入口 | [DONE] |
+| S6 | 测试：JSON-RPC 帧序列化 + MockWebServer WS 升级（握手/心跳/pending 归属/断线重连） | [DONE] |
+| S7 | 版本 0.5.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | [DONE] |

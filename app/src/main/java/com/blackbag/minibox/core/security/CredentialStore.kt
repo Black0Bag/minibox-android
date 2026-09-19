@@ -51,6 +51,13 @@ class CredentialStore(context: Context) {
         }
     }
 
+    /** 设备 WS 凭据（websocket.md：auth 参数；AGENTS.md：Keystore 存储） */
+    fun saveDeviceToken(token: String) {
+        prefs.edit().putString(KEY_DEVICE_TOKEN, token).apply()
+    }
+
+    fun loadDeviceToken(): String? = prefs.getString(KEY_DEVICE_TOKEN, null)
+
     fun clear() {
         prefs.edit().clear().apply()
     }
@@ -59,5 +66,6 @@ class CredentialStore(context: Context) {
         const val TAG = "CredentialStore"
         const val FILE_NAME = "minibox_credentials"
         const val KEY_CONNECTION_CONFIG = "connection_config"
+        const val KEY_DEVICE_TOKEN = "device_token"
     }
 }
