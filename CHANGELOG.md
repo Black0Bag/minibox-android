@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.1 - 2026-09-19
+
+- DeviceWsClientTest: per-test isolation fix (setUp/tearDown state reset,
+  ConnectionPool(0,0), proper shutdown order) — resolves CI timeout without
+  @Ignore (issue #3664)
+
 ## 0.5.0 - 2026-09-19
 
 - F3a (device WS transport, stage-2 leftover per ROADMAP):
