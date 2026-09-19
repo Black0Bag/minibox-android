@@ -1,7 +1,7 @@
 # f2b-knowledge-base（plan.md F2 后半）
 
 - 作用域: 知识库 UI：搜索、分页列表、条目 CRUD、编译作业提交与轮询
-- 状态: 进行中
+- 状态: 已完成（PR #5 已合并 main，v0.4.0，CI 全绿）
 - 分支: feature/f2b-knowledge-base
 - 版本: 0.3.0 → 0.4.0
 - 计划依据: docs/plan.md「F2：知识库与管理 DTO」+ DEVELOPMENT_PLAN 阶段 4「知识搜索、列表、条目、编译状态」

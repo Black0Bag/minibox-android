@@ -6,8 +6,6 @@
 
 | 任务 | 作用域 | 状态 | 索引 |
 | --- | --- | --- | --- |
-| [f2b-knowledge-base](f2b-knowledge-base/index.md) | 知识库（plan.md F2 后半） | 进行中 | [index](f2b-knowledge-base/index.md) |
-
 ## 已完成
 
 | 任务 | 作用域 | 索引 |
@@ -15,3 +13,5 @@
 | f0-engine-scaffold | 工程地基：构建、CI、版本契约 | [index](f0-engine-scaffold/index.md) |
 | f0-model-network | 模型 + 网络 + 连接诊断 | [index](f0-model-network/index.md) |
 | f1-conversations-chat | 会话 + SSE 聊天闭环 | [index](f1-conversations-chat/index.md) |
+| f2-permissions-tools | 权限 + 工具 + 会话回退（计划 F2 前半提前） | [index](f2-permissions-tools/index.md) |
+| f2b-knowledge-base | 知识库（plan.md F2 后半） | [index](f2b-knowledge-base/index.md) |
