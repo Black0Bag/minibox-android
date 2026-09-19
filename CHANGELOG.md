@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.2 - 2026-09-19
+
+- DeviceWsClientTest: remove ConnectionPool(0,0,NANOSECONDS) that throws IllegalArgumentException on CI
+
 ## 0.5.1 - 2026-09-19
 
 - DeviceWsClientTest: per-test isolation fix (setUp/tearDown state reset,

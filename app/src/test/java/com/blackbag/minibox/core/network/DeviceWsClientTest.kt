@@ -104,8 +104,6 @@ class DeviceWsClientTest {
         )
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         okHttpClient = OkHttpClient.Builder()
-            // 禁用连接池：避免前序测试残留的空闲连接影响当前测试
-            .connectionPool(okhttp3.ConnectionPool(0, 0, TimeUnit.NANOSECONDS))
             // 握手 5s 超时（比 HANDSHAKE_TIMEOUT_MS=10s 短，让失败快速暴露）
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
