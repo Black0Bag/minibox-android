@@ -9,6 +9,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.blackbag.minibox.feature.chat.ChatScreen
 import com.blackbag.minibox.feature.connection.ConnectionScreen
 import com.blackbag.minibox.feature.conversations.ConversationsScreen
+import com.blackbag.minibox.feature.knowledge.KnowledgeEntryScreen
+import com.blackbag.minibox.feature.knowledge.KnowledgeScreen
 import com.blackbag.minibox.feature.settings.SettingsScreen
 
 /**
@@ -33,6 +35,12 @@ data object ConversationsKey
 
 /** 设置路由 key（权限模式 + 工具列表） */
 data object SettingsKey
+
+/** 知识库主屏路由 key（搜索/条目/编译三 Tab） */
+data object KnowledgeKey
+
+/** 知识库条目详情路由 key（查看/编辑/删除） */
+data class KnowledgeEntryKey(val entryId: Long)
 
 /** 聊天路由 key（携带会话 ID） */
 data class ChatKey(val sessionId: String)
@@ -69,6 +77,19 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
                 }
                 is SettingsKey -> NavEntry(key) {
                     SettingsScreen(
+                        onBack = ::goBack,
+                        onOpenKnowledge = { navigate(KnowledgeKey) },
+                    )
+                }
+                is KnowledgeKey -> NavEntry(key) {
+                    KnowledgeScreen(
+                        onBack = ::goBack,
+                        onOpenEntry = { id -> navigate(KnowledgeEntryKey(id)) },
+                    )
+                }
+                is KnowledgeEntryKey -> NavEntry(key) {
+                    KnowledgeEntryScreen(
+                        entryId = key.entryId,
                         onBack = ::goBack,
                     )
                 }

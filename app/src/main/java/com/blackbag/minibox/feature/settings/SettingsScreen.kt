@@ -47,6 +47,7 @@ import com.blackbag.minibox.core.model.ToolInfo
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onOpenKnowledge: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: SettingsViewModel = viewModel()
@@ -136,6 +137,26 @@ fun SettingsScreen(
                                     color = MaterialTheme.colorScheme.onErrorContainer,
                                 )
                             }
+                        }
+                    }
+                }
+
+                // 知识库入口（plan.md F2 后半：DEVELOPMENT_PLAN 阶段 4）
+                item {
+                    Card(
+                        onClick = onOpenKnowledge,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            Text("知识库", style = MaterialTheme.typography.titleMedium)
+                            Text(
+                                text = "搜索、条目管理与编译",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }

@@ -25,12 +25,12 @@
 
 | 步骤 | 内容 | 状态 |
 | --- | --- | --- |
-| S1 | model：KnowledgeEntry、KbSearchHit、CompileJob、搜索/编译请求体；RestClient DELETE | 待办 |
-| S2 | data：KnowledgeRepository（search/list/get/store/update/delete/compile/job） | 待办 |
-| S3 | navigation：KnowledgeKey 路由 + 设置屏入口 | 待办 |
-| S4 | feature/knowledge：搜索屏（top_k + hits 列表 score/match_type 徽章） | 待办 |
-| S5 | feature/knowledge：条目列表（分页 offset/limit + 加载更多） | 待办 |
-| S6 | feature/knowledge：条目详情（编辑 content/tags/importance + 删除确认）+ 创建 | 待办 |
-| S7 | feature/knowledge：编译（source 提交 + 作业状态轮询 progress/total） | 待办 |
-| S8 | 测试：DTO fixture + Repository MockWebServer | 待办 |
-| S9 | 版本 0.4.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | 待办 |
+| S1 | model：KnowledgeEntry、KbSearchHit、CompileJob、搜索/编译请求体；RestClient DELETE | [DONE] |
+| S2 | data：KnowledgeRepository（search/list/get/store/update/delete/compile/job） | [DONE] |
+| S3 | navigation：KnowledgeKey 路由 + 设置屏入口 | [DONE] |
+| S4 | feature/knowledge：搜索屏（top_k + hits 列表 score/match_type 徽章） | [DONE] |
+| S5 | feature/knowledge：条目列表（分页 offset/limit + 加载更多） | [DONE] |
+| S6 | feature/knowledge：条目详情（编辑 content/tags/importance + 删除确认）+ 创建 | [DONE] |
+| S7 | feature/knowledge：编译（source 提交 + 作业状态轮询 progress/total） | [DONE] |
+| S8 | 测试：DTO fixture + Repository MockWebServer | [DONE] |
+| S9 | 版本 0.4.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | [DONE] |
