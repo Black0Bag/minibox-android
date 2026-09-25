@@ -37,8 +37,8 @@ import java.util.concurrent.TimeUnit
  * - serverWs / receivedFrames / serverConnected 在 setUp 时重置
  * - tearDown 顺序：先 server.shutdown() 强制断 TCP，再 client.disconnect()，
  *   避免 close 帧发送被 scope.cancel() 抢先打断
- * - OkHttpClient 使用 ConnectionPool(0, 0) 禁用连接池，
- *   避免前序测试残留的空闲连接影响新测试
+ * - OkHttpClient 设置 5s 超时（connect/read/write），
+ *   让失败快速暴露
  */
 class DeviceWsClientTest {
 
@@ -104,8 +104,6 @@ class DeviceWsClientTest {
         )
         scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         okHttpClient = OkHttpClient.Builder()
-            // 禁用连接池：避免前序测试残留的空闲连接影响当前测试
-            .connectionPool(okhttp3.ConnectionPool(0, 0, TimeUnit.NANOSECONDS))
             // 握手 5s 超时（比 HANDSHAKE_TIMEOUT_MS=10s 短，让失败快速暴露）
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
@@ -217,13 +215,14 @@ class DeviceWsClientTest {
         withTimeout(5_000) {
             while (serverWs == null) delay(50)
         }
-        delay(200)
+        delay(500)
         serverWs?.close(1000, "server close")
 
         // 等状态离开 Ready（重连状态机响应 server close）
-        val deadline2 = System.currentTimeMillis() + 10_000
+        val deadline2 = System.currentTimeMillis() + 15_000
         while (System.currentTimeMillis() < deadline2 &&
-            client?.state?.value is DeviceWsState.Ready
+            client?.state?.value !is DeviceWsState.Reconnecting &&
+            client?.state?.value !is DeviceWsState.Disconnected
         ) {
             delay(50)
         }

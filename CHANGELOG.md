@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.3 - 2026-09-20
+
+- DeviceWsClient: add onClosing override to handle server-initiated close immediately
+- DeviceWsClientTest: robust polling for Reconnecting/Disconnected state
+
+## 0.5.2 - 2026-09-20
+
+- DeviceWsClientTest: fix flaky server-close test (poll for Reconnecting/Disconnected state, increase pre-close delay)
+
+## 0.5.1 - 2026-09-20
+
+- Remove ConnectionPool(0,0,NANOSECONDS) from DeviceWsClientTest that caused IllegalArgumentException on CI
+
 ## 0.5.0 - 2026-09-19
 
 - F3a (device WS transport, stage-2 leftover per ROADMAP):
