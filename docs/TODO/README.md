@@ -6,6 +6,7 @@
 
 | 任务 | 作用域 | 状态 | 索引 |
 | --- | --- | --- | --- |
+| f4-integration | 前后端四级联调：容器后端实例 + 逐级检查单 + 契约偏差修复（L3） | 进行中 | [index](f4-integration/index.md) |
 ## 已完成
 
 | 任务 | 作用域 | 索引 |
@@ -15,3 +16,4 @@
 | f1-conversations-chat | 会话 + SSE 聊天闭环 | [index](f1-conversations-chat/index.md) |
 | f2-permissions-tools | 权限 + 工具 + 会话回退（计划 F2 前半提前） | [index](f2-permissions-tools/index.md) |
 | f2b-knowledge-base | 知识库（plan.md F2 后半） | [index](f2b-knowledge-base/index.md) |
+| f3a-ws-client | 设备 WS 传输层（阶段 2 遗留、F3 前置） | [index](f3a-ws-client/index.md) |

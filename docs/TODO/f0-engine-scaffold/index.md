@@ -7,7 +7,7 @@
 - 参考机制：minibile 仓库（Black0Bag/minibile）的 CI 门禁与版本契约，仅借鉴机制不复制结构。
 - 版本基线（沿用 minibile 已验证组合，2026-09 运行中）：
   - AGP 8.13.2 / Kotlin 2.2.21 / Gradle 8.13 / JDK 21 / Compose BOM 2026.02.01
-  - compileSdk 36 / targetSdk 34 / minSdk 26
+  - compileSdk 36 / targetSdk 34 / minSdk 29（F0 期间由 26 上调）
   - applicationId：`com.blackbag.minibox`
 
 ## 验收标准

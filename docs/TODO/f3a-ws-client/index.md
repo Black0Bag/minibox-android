@@ -1,7 +1,7 @@
 # f3a-ws-client（阶段 2 遗留欠账，F3 前置）
 
 - 作用域: 设备 WebSocket 传输层：JSON-RPC 2.0 帧、状态机、pending map、心跳、重连
-- 状态: 进行中
+- 状态: 已完成（S1–S7 全部 DONE，v0.5.0，CI 全绿）
 - 分支: feature/f3a-ws-client
 - 版本: 0.4.0 → 0.5.0
 - 计划依据: docs/plan.md 里程碑 3 遗留 + ROADMAP 欠账 #2（F3 设备代理前置）
@@ -39,4 +39,3 @@
 | S5 | navigation：DeviceKey + ConnectionScreen 入口 | [DONE] |
 | S6 | 测试：JSON-RPC 帧序列化 + MockWebServer WS 升级（握手/心跳/pending 归属/断线重连） | [DONE] |
 | S7 | 版本 0.5.0 + CHANGELOG + 提交推送 + PR + CI + 合并 | [DONE] |
-# F3a WS test fix applied 1789790076

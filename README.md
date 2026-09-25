@@ -4,14 +4,15 @@ minibox 的 Android 用户界面和设备代理。后端是 Agent 中枢，APP �
 
 ## 当前状态
 
-**工程准备阶段，尚未创建 Gradle/Kotlin 源码。**
+**源码工程已建，当前版本 0.5.0。** 已交付：F0 网络地基与连接诊断（0.1.0）、F1 会话 + SSE 聊天闭环（0.2.0）、F2 权限/工具/rewind（0.3.0）、F2b 知识库（0.4.0）、F3a 设备 WebSocket 传输层（0.5.0）。进度以 `docs/TODO/ROADMAP.md` 对表为准。
 
-当前仓库已经完成产品边界、后端契约、Compose/Navigation 3 架构、无障碍门禁和开发顺序建档。创建源码前仍需确认：
+待开发：F3 主体（前台服务、18 项设备执行器、命令审批 UI）与管理面补全（LLM 模型列表、监控）。
 
-1. Android 最低版本与目标版本；
-2. APP 连接后端的网络范围和 REST 认证方案；
-3. 首版必须跨后端重启保留的会话/项目状态；
-4. 是否在生成 Retrofit DTO 前先冻结 OpenAPI。
+仍待决策（不阻塞当前开发）：
+
+1. APP 连接后端的网络范围（minSdk/targetSdk 已定：29/34，REST 认证为固定 Bearer Token）；
+2. 首版必须跨后端重启保留的团队项目状态（会话消息已由后端持久化）；
+3. 是否生成 OpenAPI 以消除手写 DTO 漂移。
 
 ## 技术方向
 
@@ -23,7 +24,7 @@ minibox 的 Android 用户界面和设备代理。后端是 Agent 中枢，APP �
 - Android Keystore 支持的凭据存储
 - Accessibility / MediaProjection / TTS / STT 等设备执行器（分阶段授权）
 
-具体库版本在创建 Gradle 工程时以 Android 官方稳定版本和兼容矩阵为准，不在当前空仓库中伪造。
+具体库版本以 `gradle/libs.versions.toml` 为准（沿用 minibile 已验证组合，以 Android 官方稳定版本和兼容矩阵为准）。
 
 ## 文档入口
 
