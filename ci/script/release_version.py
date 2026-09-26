@@ -60,7 +60,7 @@ class ReleaseVersion:
 
     @property
     def apk_name(self) -> str:
-        return f"minibile-v{self}-arm64-v8a.apk"
+        return f"minibox-v{self}.apk"
 
     @property
     def checksum_name(self) -> str:

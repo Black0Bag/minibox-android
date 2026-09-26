@@ -50,6 +50,7 @@ Compose → ViewModel → Repository → REST/SSE/WS → Go 后端；事件反�
 - 构建：Gradle 8.13 wrapper + AGP 8.13.2 + Kotlin 2.2.21 + Compose BOM 2026.02.01；compileSdk 36 / targetSdk 34 / minSdk 29 / JDK 17 字节码（CI 用 JDK 21 运行）。
 - 版本契约：根目录 `VERSION`（bootstrap=0.0.0）→ `versionCode = major×1,000,000 + minor×1,000 + patch + 1`；`ci/script/release_version.py` 与 `app/build.gradle.kts` 双侧实现，CI `check-pr` 强制。
 - CI 门禁：`.github/workflows/pr-check.yml` 四阶段 fast → android_build(assembleDebug) → android_tests(testDebugUnitTest) → candidate；仅 pull_request 触发（merge ref 双亲校验）。
+- 发布：`.github/workflows/release-apk.yml` push main 触发 → 版本契约 + assembleDebug 成功后自动建 `v{VERSION}` Release（CHANGELOG notes + APK + sha256）；debug keystore 走 actions cache 保签名稳定。
 - 首跑结果：PR #1 CI 全绿（run 35314481436）。
 
 ## 高风险模块

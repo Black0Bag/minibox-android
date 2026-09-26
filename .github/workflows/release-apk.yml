@@ -1,0 +1,133 @@
+# minibox Android 发布流水线。
+# 触发：push 到 main（每次合并、编译成功后自动发布 APK 到 GitHub Release）或手动。
+# 产物：tag vX.Y.Z + CHANGELOG 对应小节作 Release notes + APK + sha256。
+# 幂等：tag 对应 Release 已存在时仅刷新资产（可安全重跑）。
+name: Release APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+  JAVA_VERSION: '21'
+  ANDROID_BUILD_TOOLS_VERSION: '35.0.0'
+
+jobs:
+  release:
+    name: Build and publish APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 版本契约门禁：VERSION 必须能对上 CHANGELOG 唯一且非空的 vX.Y.Z 小节，
+      # 不通过就不发布（与 PR 侧 check-pr 双保险）。
+      - name: Version contract and release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B ci/script/release_version.py release-notes --output "$RUNNER_TEMP/release-notes.md"
+          echo "VERSION=$(cat VERSION)"
+
+      # 保留 debug 签名密钥库：runner 是一次性的，不缓存则每次构建生成新 keystore、
+      # 签名次次不同，手机上无法覆盖安装。主键用 run_id 保证每跑存一份，前缀回取旧密钥。
+      # 局限：仓库缓存 7 天无活动会被清理，届时签名变化需卸载重装一次。
+      - name: Keep debug keystore stable across runs
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: android-debug-keystore-${{ github.run_id }}
+          restore-keys: |
+            android-debug-keystore-
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+
+      - name: Install required Android toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-34" \
+            "platforms;android-36" \
+            "build-tools;$ANDROID_BUILD_TOOLS_VERSION"
+
+      - name: Configure secret-free Android build
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      # 发布门禁：编译必须成功，失败即停、不产出 Release。
+      - name: Build debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Package APK and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          out="$RUNNER_TEMP/release-assets"
+          mkdir -p "$out"
+          apks=(app/build/outputs/apk/debug/*.apk)
+          test -f "${apks[0]}"
+          cp "${apks[0]}" "$out/minibox-v$version.apk"
+          (
+            cd "$out"
+            sha256sum "minibox-v$version.apk" > "minibox-v$version.apk.sha256"
+          )
+          echo "Release assets:"
+          ls -la "$out"
+          cat "$out/minibox-v$version.apk.sha256"
+
+      - name: Create or update GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          tag="v$version"
+          assets=("$RUNNER_TEMP/release-assets/minibox-v$version.apk" "$RUNNER_TEMP/release-assets/minibox-v$version.apk.sha256")
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" \
+              --title "v$version" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" \
+              "${assets[@]}"
+          fi
+          echo "Published $tag"
