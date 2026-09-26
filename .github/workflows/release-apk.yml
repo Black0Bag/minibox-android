@@ -104,9 +104,9 @@ jobs:
           version="$(tr -d '[:space:]' < VERSION)"
           out="$RUNNER_TEMP/release-assets"
           mkdir -p "$out"
-          apk="$(ls app/build/outputs/apk/debug/*.apk | head -n 1)"
-          test -n "$apk"
-          cp "$apk" "$out/minibox-v$version.apk"
+          apks=(app/build/outputs/apk/debug/*.apk)
+          test -f "${apks[0]}"
+          cp "${apks[0]}" "$out/minibox-v$version.apk"
           (
             cd "$out"
             sha256sum "minibox-v$version.apk" > "minibox-v$version.apk.sha256"
