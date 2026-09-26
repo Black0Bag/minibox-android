@@ -70,6 +70,12 @@ class SettingsViewModel(
                 permResult is RestClient.Result.HttpError -> {
                     _uiState.value.copy(loading = false, error = permResult.problem.detail)
                 }
+                permResult is RestClient.Result.DecodeFailure -> {
+                    _uiState.value.copy(loading = false, error = permResult.message)
+                }
+                toolsResult is RestClient.Result.DecodeFailure -> {
+                    _uiState.value.copy(loading = false, error = toolsResult.message)
+                }
                 toolsResult is RestClient.Result.HttpError -> {
                     // 权限加载成功但工具失败：仍展示权限区
                     if (permResult is RestClient.Result.Ok) {
@@ -104,7 +110,7 @@ class SettingsViewModel(
                 is RestClient.Result.Ok -> {
                     _uiState.value = _uiState.value.copy(
                         settingMode = false,
-                        permissions = result.value,
+                        permissions = applyModePatch(_uiState.value.permissions, result.value),
                     )
                 }
                 is RestClient.Result.HttpError -> {
@@ -119,6 +125,9 @@ class SettingsViewModel(
                 is RestClient.Result.NetworkFailure -> {
                     _uiState.value = _uiState.value.copy(settingMode = false, error = result.message)
                 }
+                is RestClient.Result.DecodeFailure -> {
+                    _uiState.value = _uiState.value.copy(settingMode = false, error = result.message)
+                }
             }
         }
     }
@@ -126,4 +135,19 @@ class SettingsViewModel(
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
+}
+
+/**
+ * 合并 PATCH /permissions/mode 的响应。
+ *
+ * 契约（api.md §5）：GET /permissions/ 返回 {mode, modes[]}，PATCH /permissions/mode
+ * 只返回 {mode}。modes 的事实源是 GET 响应；若直接用 PATCH 响应整体覆盖，
+ * modes 会被空默认值冲掉，四个模式 chip 全部消失（f4-integration 联调缺陷 Bug#2）。
+ */
+internal fun applyModePatch(
+    previous: PermissionsData?,
+    patched: PermissionsData,
+): PermissionsData {
+    if (patched.modes.isNotEmpty() || previous == null) return patched
+    return patched.copy(modes = previous.modes)
 }

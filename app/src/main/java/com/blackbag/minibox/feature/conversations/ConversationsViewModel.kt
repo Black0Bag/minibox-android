@@ -63,6 +63,9 @@ class ConversationsViewModel(
                 is RestClient.Result.NetworkFailure -> {
                     _uiState.value = _uiState.value.copy(loading = false, error = result.message)
                 }
+                is RestClient.Result.DecodeFailure -> {
+                    _uiState.value = _uiState.value.copy(loading = false, error = result.message)
+                }
             }
         }
     }
@@ -83,6 +86,9 @@ class ConversationsViewModel(
                     _uiState.value = _uiState.value.copy(creating = false, error = "凭据无效（401）")
                 }
                 is RestClient.Result.NetworkFailure -> {
+                    _uiState.value = _uiState.value.copy(creating = false, error = result.message)
+                }
+                is RestClient.Result.DecodeFailure -> {
                     _uiState.value = _uiState.value.copy(creating = false, error = result.message)
                 }
             }

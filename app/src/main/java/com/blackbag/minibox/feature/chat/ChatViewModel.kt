@@ -107,6 +107,10 @@ class ChatViewModel(
                     loadingHistory = false,
                     error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    loadingHistory = false,
+                    error = result.message,
+                )
             }
         }
     }
@@ -206,6 +210,9 @@ class ChatViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    error = result.message,
+                )
             }
         }
     }
@@ -228,6 +235,10 @@ class ChatViewModel(
                     error = result.message,
                     approval = null,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    error = result.message,
+                    approval = null,
+                )
             }
         }
     }
@@ -244,6 +255,9 @@ class ChatViewModel(
                     unauthorized = true,
                 )
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
+                    error = result.message,
+                )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
                     error = result.message,
                 )
             }

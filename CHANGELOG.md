@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.7 - 2026-09-25
+
+- fix: knowledge screen crash on open (f4-integration Bug#1) — backend could
+  answer `data.entries = null`; strict kotlinx decode threw an uncaught
+  SerializationException inside viewModelScope and killed the process.
+  - RestClient: envelope and data decode now guarded; new `Result.DecodeFailure`
+    error category (rules.md: parse failures are their own class, never crash)
+  - all 22 result-`when` branches handle DecodeFailure (diagnostics add
+    `ErrorKind.DECODE`); paired with backend fix that now always returns arrays
+    (minibox kb_handlers nil→[], regression-tested)
+- fix: permission mode chips vanished after switching (Bug#2) — PATCH
+  `/permissions/mode` returns only `{mode}` (api.md §5); SettingsViewModel
+  overwrote the whole PermissionsData and wiped `modes`. New `applyModePatch`
+  keeps GET's `modes` as source of truth (unit-tested pure function)
+- fix: every conversation screen showed the first conversation (Bug#3) —
+  NavDisplay lacked `rememberViewModelStoreNavEntryDecorator`, so all ChatKey
+  entries shared one activity-scoped ViewModelStore with default class-name
+  keys: the first ChatViewModel (sessionId frozen) was reused and its SSE
+  subscription outlived the screen. Entry-scoped stores isolate ViewModels and
+  clear them (stopping SSE collectors) when the entry pops
+
 ## 0.5.6 - 2026-09-25
 
 - ci: add Release APK workflow — every push to main (merge) builds the debug APK
