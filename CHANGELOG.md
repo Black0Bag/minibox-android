@@ -1,6 +1,17 @@
 # Changelog
 
-All notable changes to this project are documented in this file.
+
+## 0.5.4 - 2026-09-25
+
+- Fix: all connection diagnostics failed with `CLEARTEXT ... not permitted by
+  network security policy` against the local backend (found in f4-integration L1):
+  - AndroidManifest: `application android:usesCleartextTraffic="true"`
+  - Root cause: backend serves plain http/ws only (no TLS) and backend addresses
+    are raw IPs (127.0.0.1 / LAN); `network_security_config` domain rules cannot
+    whitelist IPs, and targetSdk>=28 blocks cleartext before any connection leaves
+    the device.
+  - No behavior change beyond allowing http/ws to user-configured backend;
+    REST/SSE auth (Bearer) and WS handshake remain enforced server-side.
 
 ## 0.5.3 - 2026-09-20
 

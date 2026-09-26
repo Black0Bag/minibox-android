@@ -9,7 +9,11 @@
         android:allowBackup="false"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Minibox">
+        android:theme="@style/Theme.Minibox"
+        android:usesCleartextTraffic="true">
+        <!-- 后端仅提供 http/ws（无 TLS），且地址多为裸 IP（127.0.0.1/局域网），
+             network_security_config 的域名白名单无法按 IP 放行明文，
+             targetSdk≥28 默认拦截会在建连前拒绝全部请求（f4-integration L1 实测）。 -->
 
         <activity
             android:name=".MainActivity"
