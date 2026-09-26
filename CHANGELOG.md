@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## 0.5.6 - 2026-09-25
+
+- ci: add Release APK workflow — every push to main (merge) builds the debug APK
+  and publishes a GitHub Release: tag v{VERSION}, CHANGELOG section as notes,
+  APK + sha256 assets; idempotent re-runs only refresh assets; build failure or
+  version-contract failure produces no Release
+- ci: persist ~/.android/debug.keystore via actions cache (run_id primary key +
+  prefix restore) so consecutive releases keep one signature and install as
+  updates; after 7 idle days cache eviction forces one uninstall/reinstall
+- fix: release_version.py apk_name template leftover `minibile-v{V}-arm64-v8a.apk`
+  -> `minibox-v{V}.apk` (wrong project name; builds are not ABI-split)
+
 ## 0.5.5 - 2026-09-25
 
 - docs: add f4-integration L3 task record (four-level integration checklist, scope,
