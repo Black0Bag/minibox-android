@@ -50,4 +50,5 @@
 | 2 | L1 | 裸 `/health` 返 401、挑战头 grep 未见 | 测试方路径漏 `/api/v1` 前缀；Go 将头名规范化为 `Www-Authenticate` | 非偏差，修正测试方法后全绿 |
 | 3 | L2/L3 | 打开知识库直接闪退 | 后端空库返 `entries:null` 违反 api.md §3；前端对非空字段解码 null 抛异常且未捕获 → 进程崩溃 | 后端 nil→[]（kb_handlers 契约不变量 + 回归测试）+ 前端 RestClient 解析失败入 `DecodeFailure` 独立错误分支（0.5.7） |
 | 4 | L2 | 权限模式切换后 4 个 chip 全消失 | PATCH `/permissions/mode` 只回 `{mode}`（api.md §5），VM 用响应整体覆盖清空 `modes` | `applyModePatch` 合并：modes 事实源取 GET 响应（0.5.7，纯函数单测） |
-| 5 | L2 | 新建会话进入显示首个会话内容（含 SSE 订阅悬挂） | Nav3 未加 `rememberViewModelStoreNavEntryDecorator`，所有 ChatKey 共享 Activity 级 store + 默认类名 key → 复用首个 ChatViewModel（sessionId 冻结） | entry 级 ViewModelStore 隔离，弹栈即 clear（含 SSE 收集器）（0.5.7，recipe 官方修法） |
+| 5 | L2 | 新建会话进入显示首个会话内容（含 SSE 订阅悬挂） | Nav3 未加 `rememberViewModelStoreNavEntryDecorator`，所有 ChatKey 共享 Activity 级 store + 默认类名 key → 复用首个 ChatViewModel（sessionId 冻结） | ~~entry 级 decorator~~（0.5.7 引入、0.5.8 回滚）；改用 ChatScreen `viewModel(key="chat:$sessionId")` 会话隔离（0.5.8） |
+| 6 | 启动 | **0.5.7 安装后打开即闪退（回归）** | 启动路径唯一改动 = rememberViewModelStoreNavEntryDecorator；其 entry 级 ViewModelStoreOwner 无法为 AndroidViewModel（ConnectionViewModel）提供 Application 工厂，首帧实例化即抛（代码推理，待 logcat 佐证） | 回滚 decorator 至 NavDisplay 默认（0.5.6 已验证路径）；Bug#3 改 key 隔离（0.5.8）。遗留：Activity 级 store 下每会话一 VM、其 SSE 收集器挂到进程杀（生命周期感知订阅列为下一任务，需本地 UI 测试基建） |

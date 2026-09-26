@@ -2,7 +2,24 @@
 
 All notable changes to this project are documented in this file.
 
-## 0.5.7 - 2026-09-25
+## 0.5.8 - 2026-09-26
+
+- fix: 0.5.7 installed APK crashed on launch (regression from the Bug#3 fix)
+  - root cause (code analysis of the startup path — its only 0.5.7 change was
+    the decorator; logcat confirmation welcome): rememberViewModelStoreNavEntryDecorator
+    supplies an entry-scoped ViewModelStoreOwner whose default factory cannot
+    instantiate AndroidViewModel(application) — first frame (ConnectionScreen's
+    ConnectionViewModel) threw before any UI rendered
+  - revert NavDisplay entryDecorators to NavDisplay defaults (the 0.5.6-verified
+    behavior for Connection/Settings/Knowledge/Conversations screens)
+  - Bug#3 (conversation screens showing the first conversation) re-fixed without
+    the decorator: ChatScreen now uses `viewModel(key = "chat:$sessionId")`,
+    isolating one ViewModel per session under the activity-scoped store
+  - known trade-off (f4-integration deviation log): a per-session VM keeps its
+    SSE collector alive until process death; lifecycle-aware subscription is the
+    next task — no local UI-test infra for that path yet
+  - no new automated tests this round: verified by full local unit tests +
+    assembleDebug + on-device run (local APK toolchain)
 
 - fix: knowledge screen crash on open (f4-integration Bug#1) — backend could
   answer `data.entries = null`; strict kotlinx decode threw an uncaught

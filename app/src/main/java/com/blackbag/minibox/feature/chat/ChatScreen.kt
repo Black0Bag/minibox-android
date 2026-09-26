@@ -56,6 +56,10 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
 ) {
     val viewModel: ChatViewModel = viewModel(
+        // Activity 级 store 下按会话隔离：默认 key（类名）会复用首个会话的 VM，
+        // 导致新会话显示旧会话内容（f4-integration 偏差#3；0.5.7 的 entry-decorator
+        // 方案因启动闪退回滚，偏差#6，改用此 key 方案）。
+        key = "chat:$sessionId",
         factory = viewModelFactory {
             initializer {
                 val app = this[androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
