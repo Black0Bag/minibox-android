@@ -76,6 +76,9 @@ class KnowledgeEntryViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     loading = false, error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    loading = false, error = result.message,
+                )
             }
         }
     }
@@ -105,6 +108,9 @@ class KnowledgeEntryViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     mutating = false, error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    mutating = false, error = result.message,
+                )
             }
         }
     }
@@ -124,6 +130,9 @@ class KnowledgeEntryViewModel(
                     mutating = false, unauthorized = true,
                 )
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
+                    mutating = false, error = result.message,
+                )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
                     mutating = false, error = result.message,
                 )
             }

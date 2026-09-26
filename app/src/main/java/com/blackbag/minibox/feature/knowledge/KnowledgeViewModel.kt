@@ -102,6 +102,10 @@ class KnowledgeViewModel(
                     loading = false, loadingEntries = false, loadingMore = false,
                     error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    loading = false, loadingEntries = false, loadingMore = false,
+                    error = result.message,
+                )
             }
         }
     }
@@ -129,6 +133,9 @@ class KnowledgeViewModel(
                     searching = false, unauthorized = true,
                 )
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
+                    searching = false, error = result.message,
+                )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
                     searching = false, error = result.message,
                 )
             }
@@ -163,6 +170,9 @@ class KnowledgeViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     mutating = false, error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    mutating = false, error = result.message,
+                )
             }
         }
     }
@@ -191,6 +201,9 @@ class KnowledgeViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     mutating = false, error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    mutating = false, error = result.message,
+                )
             }
         }
     }
@@ -211,6 +224,9 @@ class KnowledgeViewModel(
                     mutating = false, unauthorized = true,
                 )
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
+                    mutating = false, error = result.message,
+                )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
                     mutating = false, error = result.message,
                 )
             }
@@ -243,6 +259,9 @@ class KnowledgeViewModel(
                 is RestClient.Result.NetworkFailure -> _uiState.value = _uiState.value.copy(
                     compiling = false, error = result.message,
                 )
+                is RestClient.Result.DecodeFailure -> _uiState.value = _uiState.value.copy(
+                    compiling = false, error = result.message,
+                )
             }
         }
     }
@@ -270,6 +289,9 @@ class KnowledgeViewModel(
                     }
                     is RestClient.Result.NetworkFailure -> {
                         // 轮询期网络抖动不终止，等下一轮
+                    }
+                    is RestClient.Result.DecodeFailure -> {
+                        // 轮询期解析抖动不终止，等下一轮（与网络抖动同策略，见函数注释）
                     }
                 }
                 delay(POLL_INTERVAL_MS)

@@ -36,6 +36,14 @@ class RestClient(
         data class HttpError(val problem: ProblemDetail) : Result<Nothing>
         data class Unauthorized(val problem: ProblemDetail) : Result<Nothing>
         data class NetworkFailure(val message: String) : Result<Nothing>
+
+        /**
+         * 响应解析失败（200 但信封/数据不合法）。
+         * rules.md：网络、认证、限流、解析、业务失败必须是独立错误类别，
+         * 解析失败不得崩溃（f4-integration 联调缺陷 Bug#1：后端返 null 数组时
+         * 未捕获的 SerializationException 直接杀进程）。
+         */
+        data class DecodeFailure(val message: String) : Result<Nothing>
     }
 
     suspend fun getHealth(): Result<HealthData> = execute("/health") { envelope ->
@@ -135,8 +143,19 @@ class RestClient(
         return response.use {
             if (it.isSuccessful) {
                 val body = it.body?.string() ?: return Result.NetworkFailure("空响应体")
-                val envelope = json.decodeFromString<Envelope>(body)
-                Result.Ok(decoder(envelope))
+                val envelope = try {
+                    json.decodeFromString<Envelope>(body)
+                } catch (e: Exception) {
+                    Log.e(TAG, "响应信封解析失败: $path", e)
+                    return Result.DecodeFailure("响应解析失败: ${e.message}")
+                }
+                val decoded = try {
+                    decoder(envelope)
+                } catch (e: Exception) {
+                    Log.e(TAG, "响应数据解析失败: $path", e)
+                    return Result.DecodeFailure("响应数据解析失败: ${e.message}")
+                }
+                Result.Ok(decoded)
             } else {
                 val error = errorHandler.parse(it)
                 when {

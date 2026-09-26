@@ -46,7 +46,7 @@ class ConnectionRepository(
             val detail: String,
         )
 
-        enum class ErrorKind { NETWORK, UNAUTHORIZED, HTTP_ERROR }
+        enum class ErrorKind { NETWORK, UNAUTHORIZED, HTTP_ERROR, DECODE }
     }
 
     suspend fun diagnose(): DiagnosticResult {
@@ -65,6 +65,17 @@ class ConnectionRepository(
                     )
                 )
                 Log.w(TAG, "Health check network failure: ${healthResult.message}")
+                null
+            }
+            is RestClient.Result.DecodeFailure -> {
+                errors.add(
+                    DiagnosticResult.StepError(
+                        step = "health",
+                        kind = DiagnosticResult.ErrorKind.DECODE,
+                        detail = healthResult.message,
+                    )
+                )
+                Log.w(TAG, "Health check decode failure: ${healthResult.message}")
                 null
             }
             is RestClient.Result.HttpError -> {
@@ -107,6 +118,17 @@ class ConnectionRepository(
                 Log.w(TAG, "Ready check network failure: ${readyResult.message}")
                 null
             }
+            is RestClient.Result.DecodeFailure -> {
+                errors.add(
+                    DiagnosticResult.StepError(
+                        step = "ready",
+                        kind = DiagnosticResult.ErrorKind.DECODE,
+                        detail = readyResult.message,
+                    )
+                )
+                Log.w(TAG, "Ready check decode failure: ${readyResult.message}")
+                null
+            }
             is RestClient.Result.HttpError -> {
                 errors.add(
                     DiagnosticResult.StepError(
@@ -144,6 +166,17 @@ class ConnectionRepository(
                     )
                 )
                 Log.w(TAG, "Server status network failure: ${statusResult.message}")
+                null
+            }
+            is RestClient.Result.DecodeFailure -> {
+                errors.add(
+                    DiagnosticResult.StepError(
+                        step = "server_status",
+                        kind = DiagnosticResult.ErrorKind.DECODE,
+                        detail = statusResult.message,
+                    )
+                )
+                Log.w(TAG, "Server status decode failure: ${statusResult.message}")
                 null
             }
             is RestClient.Result.HttpError -> {
