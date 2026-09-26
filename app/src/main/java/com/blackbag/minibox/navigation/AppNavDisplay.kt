@@ -4,9 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.blackbag.minibox.feature.chat.ChatScreen
 import com.blackbag.minibox.feature.connection.ConnectionScreen
@@ -67,14 +65,10 @@ fun AppNavDisplay(modifier: Modifier = Modifier) {
         backStack = backStack,
         onBack = ::goBack,
         modifier = modifier,
-        // 每个 NavEntry 独立 ViewModelStore，entry 弹栈时 clear（skill：passingarguments recipe）：
-        // 修复会话串内容——此前所有 ChatKey 共享 Activity 级 store + 默认 key（类名），
-        // 打开任何会话都复用第一个 ChatViewModel（sessionId 冻结为首个会话），
-        // 且其 SSE 订阅在退出后悬挂（f4-integration 联调缺陷 Bug#3）。
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-        ),
+        // 不启用 rememberViewModelStoreNavEntryDecorator：其 entry 级 ViewModelStoreOwner
+        // 无法为 AndroidViewModel 提供 Application 工厂，0.5.7 实测安装后启动即闪退
+        // （f4-integration 偏差#6，启动路径唯一改动即此 decorator）。会话隔离改用
+        // ChatScreen 的 viewModel(key="chat:$sessionId")（偏差#3 的无 decorator 替代修复）。
         entryProvider = { key ->
             when (key) {
                 is ConnectionKey -> NavEntry(key) {
