@@ -3,21 +3,23 @@
 ## 目录结构
 
 ```text
-app/src/main/java/.../
+app/src/main/java/com/blackbag/minibox/
+├── MiniboxApplication.kt
+├── MainActivity.kt
 ├── core/model/
 ├── core/network/
 ├── core/security/
-├── core/designsystem/
 ├── data/
 ├── navigation/
 ├── feature/connection/
+├── feature/conversations/
 ├── feature/chat/
 ├── feature/knowledge/
-├── feature/device/
-└── feature/admin/
+├── feature/settings/
+└── feature/device/
 ```
 
-当前尚无源码；先在 app 模块按 package 实现，达到明确规模后再拆 Gradle 模块。
+源码已在 app 模块按 package 实现（当前版本 0.5.0）；达到明确规模后再拆 Gradle 模块。
 
 ## 模块划分
 
@@ -39,13 +41,13 @@ Compose → ViewModel → Repository → REST/SSE/WS → Go 后端；事件反�
 
 ## 关键入口文件
 
-- `app/src/main/java/com/blackbag/minibox/MiniboxApplication.kt`（已创建，F0）
-- `app/src/main/java/com/blackbag/minibox/MainActivity.kt`（已创建，F0，临时 Compose 占位 UI）
-- 待创建：AppNavDisplay、连接 composition root（F1）。
+- `app/src/main/java/com/blackbag/minibox/MiniboxApplication.kt`（F0）
+- `app/src/main/java/com/blackbag/minibox/MainActivity.kt`（F0）
+- `app/src/main/java/com/blackbag/minibox/navigation/AppNavDisplay.kt`（F1 起承载 Navigation 3 导航）
 
 ## 工程地基落地记录（F0，2026-09-18）
 
-- 构建：Gradle 8.13 wrapper + AGP 8.13.2 + Kotlin 2.2.21 + Compose BOM 2026.02.01；compileSdk 36 / targetSdk 34 / minSdk 26 / JDK 17 字节码（CI 用 JDK 21 运行）。
+- 构建：Gradle 8.13 wrapper + AGP 8.13.2 + Kotlin 2.2.21 + Compose BOM 2026.02.01；compileSdk 36 / targetSdk 34 / minSdk 29 / JDK 17 字节码（CI 用 JDK 21 运行）。
 - 版本契约：根目录 `VERSION`（bootstrap=0.0.0）→ `versionCode = major×1,000,000 + minor×1,000 + patch + 1`；`ci/script/release_version.py` 与 `app/build.gradle.kts` 双侧实现，CI `check-pr` 强制。
 - CI 门禁：`.github/workflows/pr-check.yml` 四阶段 fast → android_build(assembleDebug) → android_tests(testDebugUnitTest) → candidate；仅 pull_request 触发（merge ref 双亲校验）。
 - 首跑结果：PR #1 CI 全绿（run 35314481436）。

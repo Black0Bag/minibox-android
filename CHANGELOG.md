@@ -1,5 +1,15 @@
 # Changelog
 
+All notable changes to this project are documented in this file.
+
+## 0.5.5 - 2026-09-25
+
+- docs: add f4-integration L3 task record (four-level integration checklist, scope,
+  step-by-step status and deviation log table)
+- docs: fix 13 stale statements contradicting the actual code: README/docs
+  "no source yet" vs delivered v0.5.0, ROADMAP/plan/TODO index vs CHANGELOG,
+  structure/ARCHITECTURE trees vs actual packages, minSdk record 26 to 29
+- docs: restore CHANGELOG header line accidentally dropped in the 0.5.4 entry
 
 ## 0.5.4 - 2026-09-25
 

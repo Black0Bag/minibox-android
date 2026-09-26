@@ -2,25 +2,26 @@
 
 ## 说明
 
-以下是待创建工程的目标结构，不代表当前已有源码。
+以下为分层设计；当前以单 app 模块按 package 落地（实际目录见 structure.md），物理多模块化待规模足够后再拆。
 
 ## 分层
 
 ```text
 app (composition + Navigation 3)
-├── core:model
-├── core:network
-├── core:security
-├── core:designsystem
+├── core/model
+├── core/network
+├── core/security
 ├── data
-├── feature:connection
-├── feature:chat
-├── feature:knowledge
-├── feature:device
-└── feature:admin
+├── navigation
+├── feature/connection
+├── feature/conversations
+├── feature/chat
+├── feature/knowledge
+├── feature/settings
+└── feature/device
 ```
 
-初期可先用单 app 模块按 package 分层，确认边界后再物理多模块化，避免空仓库过早复杂化。
+当前用单 app 模块按 package 分层，确认边界后再物理多模块化，避免过早复杂化。
 
 ## 单向数据流
 
